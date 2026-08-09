@@ -1,0 +1,25 @@
+{
+    "title": "Algorithms I",
+    "docs": [
+        {
+            "title": "Asymptotic Bounds",
+            "source": "1.typ",
+            "slug": "asymptotic-bounds"
+        },
+        {
+            "title": "Solving Recurrences",
+            "source": "2.typ",
+            "slug": "solving-recurrences"
+        },
+        {
+            "title": "Algorithmic Paradigms",
+            "source": "3.typ",
+            "slug": "algorithmic-paradigms"
+        },
+        {
+            "title": "Graph Algorithms",
+            "source": "4.typ",
+            "slug": "graph-algorithms"
+        }
+    ]
+}

@@ -1,0 +1,68 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import { getCollection } from "astro:content";
+
+const categories = await getCollection("categories");
+---
+
+<Layout title="archive">
+  <div class="body">
+    <Sidebar categories={categories} />
+    <main class="viewer empty">
+      <div class="empty-state">
+        <span class="material-symbols-outlined">draft</span>
+        <h1>archive</h1>
+        <p>
+          a collection of random notes and other stuff<br />scroll through the sidebar and find something interesting
+        </p>
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<style>
+  .body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .viewer {
+    flex: 1;
+    min-width: 0;
+  }
+  .empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .empty-state {
+    max-width: 32rem;
+    text-align: center;
+    padding: 2rem;
+    color: var(--ink-soft);
+  }
+  .empty-state .material-symbols-outlined {
+    font-size: 2rem;
+    color: var(--accent);
+  }
+  .empty-state h1 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--ink);
+    margin: 0.6rem 0 0.6rem;
+  }
+  .empty-state p {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  @media (max-width: 720px) {
+    .body {
+      flex-direction: column;
+    }
+  }
+</style>

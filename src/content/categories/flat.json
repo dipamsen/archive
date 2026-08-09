@@ -1,0 +1,20 @@
+{
+    "title": "Automata Theory",
+    "docs": [
+        {
+            "title": "Unrestricted Grammars",
+            "source": "unrestricted-grammars.typ",
+            "slug": "unrestricted-grammars"
+        },
+        {
+            "title": "Problems on TMs, UGs",
+            "source": "tm-tut.typ",
+            "slug": "tutorial-tm-ug"
+        },
+        {
+            "title": "Problems on Undecidability",
+            "source": "undecidability-tut.typ",
+            "slug": "tutorial-undecidability"
+        }
+    ]
+}

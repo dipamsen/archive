@@ -1,0 +1,15 @@
+{
+  "title": "Algorithms II",
+  "docs": [
+    {
+      "title": "Amortized Analysis",
+      "source": "amortized.typ",
+      "slug": "amortized-analysis"
+    },
+    {
+      "title": "Fibonacci Heaps",
+      "source": "fibheap.typ",
+      "slug": "fibonacci-heaps"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+    "title": "Miscellaneous",
+    "docs": [
+        {
+            "title": "Probability Ramblings",
+            "source": "probability-rambling.typ",
+            "slug": "probability-ramblings"
+        },
+        {
+            "title": "CS229 PSets and Notes",
+            "source": "CS229/main.typ",
+            "slug": "cs229"
+        }
+    ]
+}

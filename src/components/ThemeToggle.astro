@@ -1,0 +1,42 @@
+---
+---
+
+<button id="theme-toggle" class="theme-toggle" aria-label="Toggle color theme" type="button">
+  <span class="material-symbols-outlined" data-icon>light_mode</span>
+</button>
+
+<script is:inline>
+  const btn = document.getElementById("theme-toggle");
+  const icon = btn.querySelector("[data-icon]");
+
+  function sync() {
+    const theme = document.documentElement.dataset.theme ?? "light";
+    icon.textContent = theme === "dark" ? "dark_mode" : "light_mode";
+  }
+  sync();
+
+  btn.addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("archive-theme", next);
+    sync();
+  });
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 6px;
+  }
+  .theme-toggle:hover {
+    color: var(--ink);
+    background: var(--accent-soft);
+  }
+</style>

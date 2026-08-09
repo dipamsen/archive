@@ -1,0 +1,10 @@
+{
+  "title": "Programming Paradigms for Computation",
+  "docs": [
+    {
+      "title": "Solving Some Problems",
+      "source": "thoughts.typ",
+      "slug": "ppc-thoughts"
+    }
+  ]
+}

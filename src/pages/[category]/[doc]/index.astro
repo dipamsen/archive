@@ -1,0 +1,135 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Sidebar from "@/components/Sidebar.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+import order from "@/content/categories.json";
+
+export async function getStaticPaths() {
+  const categories = await getCollection("categories");
+  return categories
+    .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id))
+    .flatMap((cat) =>
+      cat.data.docs.map((doc) => ({
+        params: { category: cat.id, doc: doc.slug ?? doc.source.replace(/\.typ$/, "") },
+        props: { categories, category: cat, doc },
+      })),
+    );
+}
+
+interface Props {
+  categories: CollectionEntry<"categories">[];
+  category: CollectionEntry<"categories">;
+  doc: CollectionEntry<"categories">["data"]["docs"][number];
+}
+const { categories, category, doc } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const slug = doc.slug ?? doc.source.replace(/\.typ$/, "");
+const pdfPath = `${base}/pdfs/${category.id}/${slug}.pdf`;
+---
+
+<Layout title={doc.title}>
+  <div class="body">
+    <Sidebar categories={categories} current={{ category: category.id, doc: slug }} />
+    <main class="viewer">
+      <div class="viewer-head">
+        <div>
+          <span class="viewer-category">{category.data.title}</span>
+          <h1>{doc.title}</h1>
+        </div>
+        <a class="open-native" href={pdfPath} target="_blank" rel="noopener">
+          <span class="material-symbols-outlined">open_in_new</span>
+          Open PDF
+        </a>
+      </div>
+      <div class="sheet">
+        <iframe src={pdfPath} title={doc.title} loading="lazy"></iframe>
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<style>
+  .body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .viewer {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 2rem 2rem;
+  }
+  .viewer-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .viewer-category {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 0.2rem 0 0;
+    color: var(--ink);
+  }
+  .open-native {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.4rem 0.7rem;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .open-native:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .open-native .material-symbols-outlined {
+    font-size: 17px;
+  }
+  .sheet {
+    flex: 1;
+    min-height: 0;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  @media (max-width: 720px) {
+    .body {
+      flex-direction: column;
+    }
+    .viewer {
+      padding: 1rem;
+    }
+    .sheet {
+      min-height: 70vh;
+    }
+  }
+</style>
