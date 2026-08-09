@@ -1,8 +1,5 @@
 #import "template.typ": *
 #import "algorithm.typ": *
-// Fibonacci Heap writeup
-#import "template.typ": *
-#import "algorithm.typ": *
 #import "@preview/cetz:0.5.2"
 
 
