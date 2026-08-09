@@ -2,13 +2,19 @@
 import Layout from "../layouts/Layout.astro";
 import Sidebar from "../components/Sidebar.astro";
 import { getCollection } from "astro:content";
+import order from "@/content/categories.json";
 
 const categories = await getCollection("categories");
+const orderedCategories = categories.sort((a, b) => {
+  const aOrder = order.indexOf(a.id);
+  const bOrder = order.indexOf(b.id);
+  return aOrder - bOrder;
+});
 ---
 
 <Layout title="archive">
   <div class="body">
-    <Sidebar categories={categories} />
+    <Sidebar categories={orderedCategories} />
     <main class="viewer empty">
       <div class="empty-state">
         <span class="material-symbols-outlined">draft</span>
