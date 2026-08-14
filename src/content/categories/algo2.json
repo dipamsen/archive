@@ -10,6 +10,11 @@
       "title": "Fibonacci Heaps",
       "source": "fibheap.typ",
       "slug": "fibonacci-heaps"
+    },
+    {
+      "title": "Maximum Flow",
+      "source": "maxflow.typ",
+      "slug": "maximum-flow"
     }
   ]
 }

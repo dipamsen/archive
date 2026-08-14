@@ -1,5 +1,3 @@
-#import "algorithm.typ": *
-// amortized analysis notes (not wired up in the sample category.json yet)
 #import "template.typ": *
 #import "algorithm.typ": *
 
