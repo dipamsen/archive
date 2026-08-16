@@ -38,7 +38,7 @@ Such a data structure is useful in many algorithms, most notably in Dijkstra's a
 
 Usually, we implement a priority queue using a Binary Heap, which is a simple data structure, which can be implemented by an array. It supports all three operations in worst case $O(log n)$ time.
 
-A Fibonacci Heap is a data structure which implements the priority queue operations with better amortized costs. In particular, it supports $O(1)$ #insert, $O(1)$ #decrease-key and $O(log n)$ #extract-min operations (amortized). Theoretically, this provides an asymptotic improvement to the running times of Dijkstra's and Prim's algorithms (as compared to using a binary heap) from $O(n log m + m log n)$ to $O(n log m + m)$. (This is a strict improvement when $m in.not O(n)$, i.e. the graph is dense.) Let us try to build up this data structure from the ground up.
+A Fibonacci Heap is a data structure which implements the priority queue operations with better amortized costs. In particular, it supports $O(1)$ #insert, $O(1)$ #decrease-key and $O(log n)$ #extract-min operations (amortized). Theoretically, this provides an asymptotic improvement to the running times of Dijkstra's and Prim's algorithms (as compared to using a binary heap) from $O(n log n + m log n)$ to $O(n log n + m)$. (This is a strict improvement when $m in.not O(n)$, i.e. the graph is dense.) Let us try to build up this data structure from the ground up.
 
 = Binomial Heaps
 
@@ -1120,7 +1120,7 @@ To summarize, these are the costs of the different operations that we defined fo
 1. Analyse the running time of the Dijkstra's algorithm for single source shortest path and Prim's algorithm for computing a minimum spanning tree in a graph when the priority queue being used in a Fibonacci Heap instead of a Binary Heap. Assume that the number of vertices in the graph is $n$ and the number of edges $m$.
 
 #soln-box[
-  Dijkstra's and Prim's algorithms require $n$ #extract-min operations and $m$ #decrease-key operations. Since their amortized costs are $O(log m)$ and $O(1)$ respectively, the total running time of the algorithm is bounded by $O(n log m + m)$.
+  Dijkstra's and Prim's algorithms require $n$ #extract-min operations and $m$ #decrease-key operations. Since their amortized costs are $O(log n)$ and $O(1)$ respectively, the total running time of the algorithm is bounded by $O(n log n + m)$.
 ]
 
 
@@ -1321,12 +1321,11 @@ To summarize, these are the costs of the different operations that we defined fo
   Let us inductively construct a tree $C_m$ which has a degree of 2, one of its children is a linear chain of $m - 1$ marked nodes and one leaf node. The other child is a extra node $e_m$ with key $oo$.
 
   *Base:*\
-  $C_1$: #insert;($p$), #insert;($q$) ($p < q$), #insert;($-oo$), #extract-min. We have a chain of $p -> q$. Now #insert;($oo$), #insert;($-oo$), #extract-min. Our root node is $p$ and it has two children, $q$ and $oo$. It has $1 - 1 = 0$ marked nodes.
+  $C_1$: #insert;($p$), #insert;($oo$), #insert;($-oo$), #extract-min. We have a chain of $p -> oo$. Now #insert;($q$), #insert;($q'$), $p < q < q'$, #insert;($-oo$), #extract-min. Our root node is $p$ and it has two children, $q$ and $oo$. Remove $q'$ by #decrease-key;($q'$, $-oo$), #extract-min.
 
   *Step:* Let the key of the root of $C_(m - 1)$ be $c$.
   - #insert;($p$), $p < c$, #insert;($e_m = oo$). Add a dummy node with key $-oo$, then #extract-min to link $p$ and $e$. 
-  - #insert;($q$), $q > p$, #insert;($e' = oo$). Add a dummy node with key $-oo$, then #extract-min to link $q$ and $e'$.
-  - Again add a dummy node with key $-oo$ and #extract-min to link $p$ and $q$.
+  - #insert;($q$), $q > p$, #insert;($e' = oo$). Add a dummy node with key $-oo$, then #extract-min to link $q$ and $e'$, and then $p$ and $q$.
   - Both trees rooted at $p$ and $C_(m - 1)$ have degree 2. So trigger a linking by adding a $-oo$ node and calling #extract-min. $C_(m - 1)$ will be linked to $p$.
   - #decrease-key;($e_(m - 1)$, $-oo$), #extract-min. This marks the original root of $C_(m - 1)$.
   - #decrease-key;($q$, $-oo$), #extract-min to cleanup and remove the additional $q$ node.
