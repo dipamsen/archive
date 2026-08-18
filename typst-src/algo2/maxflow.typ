@@ -1094,6 +1094,8 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
     So flow conservation holds (in either case $Delta > 0$ or $Delta < 0$).
     - For $v = s$ and $v = t$, flow conservation holds as total flow exiting $s$ = $|f|$ which is in its incoming edge $(t, s)$, and vice versa.
 
+  2. If a flow exists in $G'$ where all $s'$/$t'$ edges are saturated, then a feasible flow exists in $G$. (DIY :))
+
   To compute the *maximum* feasible $s-t$ flow:
   1. Find a feasible flow $f$ of $G$ using the above method. If no feasible flow exists, terminate.
   2. Construct the residual graph $G_f$ using the feasible flow $f$. The residual capacities are bounded by both the upper and lower limits:
