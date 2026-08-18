@@ -1174,7 +1174,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
 
   *Lemma 5:* If $(S, T)$ is a min-cut, there can be no edge crossing the cut in $G_f$.
 
-  *Proof:* By Min-Flow Max-Cut Theorem, $c(S, T) = |f| => c(S, T) = f(S, T)$. So we have
+  *Proof:* By Max-Flow Min-Cut Theorem, $c(S, T) = |f| => c(S, T) = f(S, T)$. So we have
   $
   sum_(u in S\ v in T) c(u, v)  = sum_(u in S\ v in T) f(u, v)\ sum_(u in S\ v in T) (c(u, v) - f(u, v)) = 0
   $

@@ -690,7 +690,6 @@ Now, due to the $i - 2$ property, the number of nodes in a tree is exponential t
 
 Now we have gotten our $O(log n)$ amortized bound for #extract-min operations! Are we done? Not just yet... We need to reanalyse our #decrease-key function since we may need to do additional cuts to ensure the $i - 2$ property. Let's bring everything together and complete our analysis.
 
-#pagebreak(weak: true)
 
 = Fibonacci Heaps!
 
@@ -1196,9 +1195,8 @@ To summarize, these are the costs of the different operations that we defined fo
 
   *Inductive step ($C_m -> C_(m+1)$):* Suppose $C_m$ is a chain with root equal to $c$.
 
-  1. Insert two new nodes $p, q$ with keys smaller than $c$ ($p < q < c$), then insert a dummy node with key $-oo$ and call #extract-min: #consolidate links $p, q$ (both degree $0$) into a $2$-node chain $P$ (root $p$, child $q$).
-  2. Insert another dummy node with key $-oo$ and call #extract-min again: #consolidate now links $P$ (degree $1$) with $C_m$ (degree $1$). Since $p$ has the smallest key overall, $p$ becomes the new root, with two children: its old child $q$, and the root of $C_m$.
-  3. Call #decrease-key;$(q, -infinity)$ and #extract-min. This removes node $q$ from the heap.
+  1. Insert two new nodes $p, q$ with keys smaller than $c$ ($p < q < c$), then insert a dummy node with key $-oo$ and call #extract-min: #consolidate links $p, q$ (both degree $0$) into a $2$-node chain $P$ (root $p$, child $q$), and then links $P$ (degree $1$) with $C_m$ (degree $1$). Since $p$ has the smallest key overall, $p$ becomes the new root, with two children: its old child $q$, and the root of $C_m$.
+  2. Call #decrease-key;$(q, -infinity)$ and #extract-min. This removes node $q$ from the heap.
 
   The heap is now exactly $C_(m+1)$: a linear chain of $m+1$ nodes. 
 
