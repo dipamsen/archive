@@ -19,7 +19,7 @@
   show math.equation: set text(font: "TeX Gyre Pagella Math")
 
   show title: set align(center)
-  show title: set text(24pt) 
+  show title: set text(24pt)
 
   set par(justify: true)
 
@@ -28,14 +28,14 @@
 
   show heading: set text(primary-color)
   show title: set text(primary-color)
-  
-  
+
+
   show figure: it => {
     set align(center)
     block(
       above: 1.5em,
       below: 1.8em,
-      breakable: false,
+      breakable: true,
       {
         it.body
         v(0.65em)
@@ -61,7 +61,7 @@
   }
 
   set figure(numbering: "1")
-  
+
   body
 }
 
@@ -101,7 +101,7 @@
   numbered: true,
   body
 ) = {
-  theorem-counter.step()
+  if numbered { theorem-counter.step() }
   block(
     above: 1.4em,
     below: 1.4em,
@@ -128,16 +128,17 @@
 
 // --- Preset variants for common use cases ---
 #let theorem(body, title: "Theorem", numbered: true) = theorem-box(
-  title: title, color: rgb("#3A0CA3"), numbered: numbered, body
+  title: title, color: primary-color, numbered: numbered, body
 )
 
 #let definition(body, title: "Definition", numbered: true) = theorem-box(
   title: title, color: rgb("#0C7B93"), numbered: numbered, body
 )
 
-#let lemma(body, title: "Lemma", numbered: true) = theorem-box(
-  title: title, color: rgb("#3A0CA3"), numbered: numbered, body
-)
+#let lemma(body, title: "Lemma", numbered: true) = [
+  #theorem-counter.step()
+  #text(fill: primary-color, weight: "bold")[#title #context theorem-counter.display():] #body
+]
 
 #let important(body, title: "Important") = theorem-box(
   title: title, color: rgb("#C1121F"), numbered: false, body

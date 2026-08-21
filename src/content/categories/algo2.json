@@ -15,6 +15,11 @@
       "title": "Maximum Flow",
       "source": "maxflow.typ",
       "slug": "maximum-flow"
+    },
+    {
+      "title": "Push Relabel",
+      "source": "push-relabel.typ",
+      "slug": "push-relabel"
     }
   ]
 }
