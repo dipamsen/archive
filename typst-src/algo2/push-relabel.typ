@@ -60,7 +60,7 @@ $
   Delta = min{alpha_f (v), c_f (v, w)}
 $
 
-We call a push operation to be a *saturating* push, if $Delta = c_f (v, w)$ ($c_f (v, w) <= alpha (v)$). Otherwise, we call it a *non-saturating* push ($Delta = alpha (v)$). After a saturating push, the edge $(v, w)$ gets saturated.
+We call a push operation to be a *saturating* push, if $Delta = c_f (v, w)$ ($c_f (v, w) <= alpha (v)$). Otherwise, we call it a *non-saturating* push ($Delta = alpha_f (v)$). After a saturating push, the edge $(v, w)$ gets saturated.
 
 A push operation along a residual edge $(v, w)$ can be called a *push* on vertex $v$.
 
@@ -283,7 +283,7 @@ Thus, we require two relabel operations on both $v$ and $w$ between two consecut
 
 *Corollary of Lemma 6*: The total number of saturating pushes in #op("Push-Relabel") is $O(m n)$.
 
-*Proof*: Since the total number of relabel operations on a vertex is bounded by $O(n)$ (Lemma 5), and between two consecutive saturated pushes on a edge $(v, w)$, $v$ must be relabelled at least twice; so each edge can have at most $O(n)$ saturating pushes. Therefore, the total number of saturating pushes is $O(m n)$. #h(1fr) $qed$
+*Proof*: Since the total number of relabel operations on a vertex is bounded by $O(n)$ (Lemma 5), and between two consecutive saturated pushes on a edge $(v, w) in E_f$, $v$ must be relabelled at least twice; so each edge can have at most $O(n)$ saturating pushes. Therefore, the total number of saturating pushes is $O(m n)$. #h(1fr) $qed$
 
 #lemma[Between any two consecutive relabel operations, there can be at most $n$ non-saturating pushes.]
 
@@ -387,7 +387,7 @@ With $a$ having gotten rid of all its excess flow, $b$ (still at height $0$, hol
     for v in vertices {
       if v.label == <s> { continue }
       let node = fletcher.find-node(nodes, v.label)
-      content((rel: node.pos.xyz, to: (0, 0.6)), text(0.8em, primary-color, $#v.excess$))
+      content((rel: node.pos.xyz, to: (0, 0.6)), text(0.8em, primary-color, $#math.bold([#v.excess])$))
     }
   })
 })
@@ -435,8 +435,6 @@ As compared to Dinic's algorithm (which was an augmenting path algorithm) which 
 #v(3em)
 
 #align(center, line(length: 40%))
-
-
 
 #pagebreak(weak: true)
 

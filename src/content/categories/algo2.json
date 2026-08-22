@@ -20,6 +20,11 @@
       "title": "Push Relabel",
       "source": "push-relabel.typ",
       "slug": "push-relabel"
+    },
+    {
+      "title": "Applications of Maximum Flow",
+      "source": "applications-of-maxflow.typ",
+      "slug": "applications-of-maximum-flow"
     }
   ]
 }

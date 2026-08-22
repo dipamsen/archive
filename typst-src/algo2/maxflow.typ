@@ -24,7 +24,7 @@ We have two special vertices in a flow network, a *source* $s$ and a *sink* $t$.
 
 For convenience, we assume that all vertices $v$ lie on a path from $s$ to $t$. So, $s arrow.squiggly v arrow.squiggly t$ is a path in the graph. Thus the graph is connected, and $|E| >= |V| - 1$.
 
-We also assume, that there are no self loops in the graph and no loops of size 2 (antiparallel edges), i.e. if $(u, v) in E$, then $(v, u) in.not E$. 
+We also assume, that there are no self loops in the graph and no loops of size 2 (antiparallel edges), i.e. if $(u, v) in E$, then $(v, u) in.not E$.
 
 A *flow* in $G$ is a real valued function $f : V times V -> RR$ that satisfies the following properties:
 
@@ -103,7 +103,7 @@ i.e. the total flow out of the source.
 - Flow conservation states that total incoming flow (or total outgoing flow) in a non sink-source should be 0.
 - When neither $(u, v)$ nor $(v, u)$ exists in $E$, then $f(u, v) = f(v, u) = 0$.
 
-We also define the *total positive flow entering $v$* as 
+We also define the *total positive flow entering $v$* as
 $
 sum_(u in V\ f(u, v) > 0) f(u, v)
 $
@@ -114,7 +114,7 @@ and similarly, the *total positive flow exiting $v$*. The *total net flow* at $v
 We extend the definition for $f$ for sets of vertices, as follows:
 
 $
-f(X, y) = sum_(x in X) f(x, y) quad quad f(x, Y) = sum_(y in Y) f(x, y) quad quad 
+f(X, y) = sum_(x in X) f(x, y) quad quad f(x, Y) = sum_(y in Y) f(x, y) quad quad
 f(X, Y) = sum_(x in X) sum_(y in Y) f(x, y)
 $
 
@@ -162,9 +162,9 @@ How might one approach solving this problem? A naive approach might be to find s
 
 = Max-Flow Min-Cut Theorem
 
-A *cut* $(S, T)$ of a flow network $G$ is a partition of $V$ into $S$ and $T = V without S$ such that $s in S$ and $t in T$. 
+A *cut* $(S, T)$ of a flow network $G$ is a partition of $V$ into $S$ and $T = V without S$ such that $s in S$ and $t in T$.
 
-If $f$ is a flow, then the *net flow* across the cut $(S, T)$ (with respect to $f$) is defined as $f(S, T)$. 
+If $f$ is a flow, then the *net flow* across the cut $(S, T)$ (with respect to $f$) is defined as $f(S, T)$.
 
 The *capacity* of the cut is defined as $c(S, T)$. A *minimum cut* of a network is a cut whose capacity is the minimum over all possible cuts of the network.
 
@@ -195,7 +195,7 @@ render: (grid, nodes, edges, options) => {
     fletcher.draw-diagram(grid, nodes, edges, debug: options.debug)
 
     import cetz.draw: *
-    
+
     line((3.5, -0.5), (3.5, 4.5), stroke: (paint: primary-color, dash: "dotted"))
     content((3.5, -0.8), text(primary-color)[Cut 1])
 
@@ -224,7 +224,7 @@ f(S_2, T_2) &= f(v_1, v_3) + f(v_2, v_3) + f(v_4, v_3) + f(v_4, t)\
 &= 12 + (-4) + 7 + 4 = 19
 $
 
-and its capacity is 
+and its capacity is
 $
 c(S_2, T_2) &= c(v_1, v_3) + c(v_4, v_3) + c(v_4, t)\
 &= 12 + 7 + 4 = 23
@@ -357,7 +357,7 @@ Essentially, the residual graph consists of edges that can admit more flow.
   caption: [Residual graph of $G$ induced by $f$.]
 )
 
-Let's call a edge $(u, v) in E$ to be *saturated*, if $f(u, v) = c(u, v)$, i.e. no more flow can be pushed through the edge. 
+Let's call a edge $(u, v) in E$ to be *saturated*, if $f(u, v) = c(u, v)$, i.e. no more flow can be pushed through the edge.
 Call an edge to be *zeroed out* if $f(u, v) = 0$.
 
 
@@ -368,9 +368,9 @@ Some interesting properties of the residual graph (which can be shown):
 3. If an edge $(u, v) in E$ is neither saturated nor zeroed out, then $(u, v) in E_f$ and $(v, u) in E_f$.
 
 
-Each edge of the residual network is a *residual edge* which can admit more flow. 
+Each edge of the residual network is a *residual edge* which can admit more flow.
 
-We need to find the maximum flow from $s$ to $t$. For this, we look at paths from $s$ to $t$ in $G_f$. Given a flow network $G = (V, E)$ and a flow $f$, an *augmenting path* $p$ is a simple path from $s$ to $t$ in $G_f$. 
+We need to find the maximum flow from $s$ to $t$. For this, we look at paths from $s$ to $t$ in $G_f$. Given a flow network $G = (V, E)$ and a flow $f$, an *augmenting path* $p$ is a simple path from $s$ to $t$ in $G_f$.
 
 Clearly, every edge on a augmenting path can admit more flow. This means, that we have a potential opportunity to increase the total flow from $s$ to $t$.
 
@@ -385,11 +385,11 @@ Clearly, we can add $c_f (p)$ amount of flow to each edge in $p$, and still have
 
 #let augment = op("Augment")
 
-We define a procedure #augment on a augmenting path $p$, which updates the flow $f$ by adding $c_f (p)$ to the flow of all edges in path $p$. 
+We define a procedure #augment on a augmenting path $p$, which updates the flow $f$ by adding $c_f (p)$ to the flow of all edges in path $p$.
 
 
 
-  
+
 #let d1 = diagram(
   node-shape: circle,
   node-stroke: 1pt,
@@ -488,16 +488,16 @@ We define a procedure #augment on a augmenting path $p$, which updates the flow 
   edge(<s>, <v1>, "-|>", $5$, bend: -10deg, label-sep: 0pt)
   edge(<s>, <v1>, "<|-", $11$, bend: 10deg)
   edge(<s>, <v2>, "-|>", $1$, bend: 10deg, label-sep: 0pt)
-  edge(<s>, <v2>, "<|-", $8$, bend: -10deg)
+  edge(<s>, <v2>, "<|-", $12$, bend: -10deg)
   edge(<v1>, <v3>, "<|-", $12$)
   edge(<v2>, <v1>, "-|>", $3$, bend: 10deg, label-sep: 0pt)
   edge(<v2>, <v1>, "<|-", $1$, bend: -10deg)
-  edge(<v3>, <v2>, "-|>", $5$, label-sep: 0mm)
+  edge(<v3>, <v2>, "-|>", $9$, label-sep: 0mm)
   edge(<v2>, <v4>, "-|>", $3$, bend: 10deg)
   edge(<v2>, <v4>, "<|-", $11$, bend: -10deg)
   edge(<v4>, <v3>, "<|-", $7$)
   edge(<v3>, <t>, "-|>", $1$, label-side: left, bend: 10deg)
-  edge(<v3>, <t>, "<|-", $15$, bend: -10deg)
+  edge(<v3>, <t>, "<|-", $19$, bend: -10deg)
   edge(<v4>, <t>, "<|-", $4$, label-side: right)
 }, spacing: 0.8cm)
 
@@ -543,7 +543,7 @@ Then, $f'$ is a flow in $G$, and $|f'| > |f|$.
   $
   |f'|= f'(s, V) = sum_(v in V) f'(s, v) = sum_(v in V) f(s, v) + c_f (p) = |f| + c_f (p) > |f|
   $
-  
+
 At this point, we are at a position to give the proof of the max-flow min-cut theorem: (The following is an equivalent restatement)
 
 *Theorem 1: (Optimality Conditions for Maximum Flow)* If $f$ is a flow in $G = (V, E)$ with source $s$ and sink $t$, then the following conditions  are equivalent:
@@ -621,7 +621,7 @@ Each iteration of the algorithm requires finding a path $p$, which takes $O(V + 
   node-stroke: 1pt,
   mark-scale: 1.5,
 {
-  
+
   node((0, 0), $s$, name: "s")
   node((1, -1), $v_1$, name: "v1")
   node((1, 1), $v_2$, name: "v2")
@@ -796,7 +796,7 @@ In other words, in the layered residual graph, we have arranged the vertices int
 
 *Proof: * Let $v in L_i$, let $p$ be a shortest path from $s$ to $v$ in $G_f$. Assume, that $p$ does not exist in $G_f^L$. For this to happen, $p$ must contain some edge which was removed, so one of the edges of $p$ must be a back edge or a cross edge. Now, since $v in L_i$, and $s in L_0$, and at least one edge in $p$ is a back edge or a cross edge, this implies that $|p| > i$. But this contradicts the minimality of $p$. Thus, any shortest path from $s$ to $v$ in $G_f$ must also be present in $G_f^L$.
 
-This lemma essentially states, that *the layered residual graph $G_f^L$ is a succinct representation of the shortest paths in $G_f$.* 
+This lemma essentially states, that *the layered residual graph $G_f^L$ is a succinct representation of the shortest paths in $G_f$.*
 
 == Complexity
 Now we can come to the analysis of the number of iterations of the algorithm.
@@ -809,11 +809,11 @@ Define $delta_i = delta_G_f_i (s, t)$. We have, $delta_k = oo$ (after $k$ iterat
 
 *Claim:* $delta_0 <= delta_1 <= delta_2 <= dots.c <= delta_(k - 1) < delta_k = oo$.
 
-*Proof:* Let the current distance between $s$ and $t$ be $delta_i$. In the next iteration, we choose a shortest path from $s$ to $t$ (in $G_f_i$), and augment our flow along this path. 
+*Proof:* Let the current distance between $s$ and $t$ be $delta_i$. In the next iteration, we choose a shortest path from $s$ to $t$ (in $G_f_i$), and augment our flow along this path.
 
 Call an edge $(u, v)$ in an augmenting path $p$ in $G_f$ *critical*, if $c_f (p) = c_f (u, v)$, i.e. it's residual capacity is the minimum on its path. Each augmenting edge has at least one critical edge. When we augment the flow along $p$, $(u, v)$ gets saturated.
 
-Once we choose some shortest path $p$ in $G_f_i$, let $(u, v)$ be a critical edge in $p$. After augmentation, the resulting residual graph is $G_f_(i + 1)$. Due to augmentation, the edge $(u, v)$ will become saturated, so won't be present in $G_f_(i + 1)$. 
+Once we choose some shortest path $p$ in $G_f_i$, let $(u, v)$ be a critical edge in $p$. After augmentation, the resulting residual graph is $G_f_(i + 1)$. Due to augmentation, the edge $(u, v)$ will become saturated, so won't be present in $G_f_(i + 1)$.
 
 What is $delta_(i + 1)$?
 
@@ -855,7 +855,7 @@ So, in a single iteration, we find a set of $s-t$ paths in the layered residual 
   #aline[#While there exists an augmenting path in $G_f$]
   #aline(indent: 1)[build the layered residual graph $G_f^L$]
   #aline(indent: 1)[compute a blocking flow $b$ in $G_f^L$]
-  #aline(indent: 1)[$f  <- f + b$ #comment[augment $f$ with $b$]] 
+  #aline(indent: 1)[$f  <- f + b$ #comment[augment $f$ with $b$]]
   #aline[#Return $f$]
 ]
 
@@ -944,7 +944,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
     mark-scale: 1.5,
     node-fill: white,
   {
-    
+
     node((0, 0), $v$, name: "v")
     edge((-1, -1), (0, 0), "-|>", $c_1$,  label-sep: 0pt)
     edge((-1.5, 0), (0, 0), "-|>", $c_2$)
@@ -961,7 +961,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
     mark-scale: 1.5,
     node-fill: white,
   {
-    
+
     node((0, 0), $v_"in"$, name: "vin")
     node((1, 0), $v_"out"$, name: "vout")
     edge((-1, -1), (0, 0), "-|>", $c_1$,  label-sep: 0pt)
@@ -1013,17 +1013,17 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
 6. *[Flow with Vertex Capacities]* Suppose every vertex $v$, except $s$, $t$, has a capacity $c_v$, meaning that at most $c_v$ units of flow may pass through v. Design an algorithm that computes a maximum $s$ − $t$ flow subject to both edge capacities and vertex capacities.
 
 #soln-box[
-  Convert the network to an equivalent network with only edge capacity constraints (as in Problem 4). Run a standard max-flow algorithm (Ford-Fulkerson / Edmonds-Karp). Map the max-flow in $G'$ back to $G$. This gives a max $s-t$ flow in $G$. 
+  Convert the network to an equivalent network with only edge capacity constraints (as in Problem 4). Run a standard max-flow algorithm (Ford-Fulkerson / Edmonds-Karp). Map the max-flow in $G'$ back to $G$. This gives a max $s-t$ flow in $G$.
 ]
 
 7. *[Maximum Flow with Lower Bounds]* Each edge $e$ has a lower bound $l_e$ and upper bound $u_e$, and every feasible flow must satisfy $l_e <= f_e <= u_e$. Design an algorithm to determine whether a feasible $s$ − $t$ flow exists. Then extend your algorithm to compute a maximum feasible $s$-$t$ flow.
 
 #soln-box[
   To determine if a feasible flow exists, we transform the network $G$ into an equivalent max-flow problem with edge capacities $G'$:
-  
+
   1. Add a supersource $s'$ and a supersink $t'$.
   2. For each edge $(u, v) in E$, set its new capacity $c'(u, v) = u_(u, v) - l_(u, v)$.
-  3. By forcing $l_(u, v)$ flow across each edge, we create flow imbalances at the nodes (flow conservation is violated). For each vertex $v in V$, define the *net demand* 
+  3. By forcing $l_(u, v)$ flow across each edge, we create flow imbalances at the nodes (flow conservation is violated). For each vertex $v in V$, define the *net demand*
      $ Delta(v) = sum_((v, w) in E) l_(v, w) - sum_((u, v) in E) l_(u, v) $
   4. If $Delta(v) > 0$, add an edge $(v, t')$ with capacity $Delta(v)$. If $Delta(v) < 0$, add an edge $(s', v)$ with capacity $-Delta(v)$.
   5. To satisfy the conservation of flow from $s$ to $t$, add an artificial edge $(t, s)$ with infinite capacity $c'(t, s) = oo$.
@@ -1040,7 +1040,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
     node((1, -1), $v_1$, name: "v1")
     node((1, 1), $v_2$, name: "v2")
     node((2, 0), $t$, name: "t")
-  
+
     edge(<s>, <v1>, "-|>", $1-3$)
     edge(<s>, <v2>, "-|>", $3-4$, label-side: right)
     edge(<v2>, <v1>, "-|>", $0-1$)
@@ -1060,7 +1060,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
     node((1, 1), $v_2$, name: "v2")
     node((2, 0), $t$, name: "t")
     node((3, 0), $t'$, name: "T")
-  
+
     edge(<s>, <v1>, "-|>", $2$)
     edge(<s>, <v2>, "-|>", $1$, label-side: right)
     edge(<v2>, <v1>, "-|>", $1$, label-pos: 0.4)
@@ -1077,7 +1077,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
 
   #figure(grid(columns: 2, gutter: 3em, d1, d2, align: horizon), caption: [(a) Network $G$ with lower and upper bounds on edges (b) Equivalent network $G'$ with edge capacities])
 
-  *Proof*: 
+  *Proof*:
 
   1. If a feasible flow $f$ exists in $G$, then a max-flow exists in $G'$ where all $s'$/$t'$ edges are saturated.
 
@@ -1090,7 +1090,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
     => sum_((v, w)  in E) (f'(v, w) + l_(v, w)) - sum_((u, v) in E) (f'(u, v) + l_(u, v)) = 0\
     => sum_((v, w) in E) f'(v, w) - sum_((u, v) in E) f'(u, v) + sum_((v, w) in E) l_(v, w) - sum_((u, v) in E) l_(u, v) = 0\
     => sum_((v, w) in E) f'(v, w) - sum_((u, v) in E) f'(u, v) + Delta(v) = 0
-    $ 
+    $
     So flow conservation holds (in either case $Delta > 0$ or $Delta < 0$).
     - For $v = s$ and $v = t$, flow conservation holds as total flow exiting $s$ = $|f|$ which is in its incoming edge $(t, s)$, and vice versa.
 
@@ -1108,7 +1108,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
 8. *[Minimum Cut After Maximum Flow]* Suppose a maximum flow has already been computed. Design an $O(|V| + |E|)$-time algorithm that finds an $s$ − $t$ minimum cut.
 
 #soln-box[
-  Compute the residual graph. Run DFS on the residual graph $G_f$ starting from vertex $s$, and find the set 
+  Compute the residual graph. Run DFS on the residual graph $G_f$ starting from vertex $s$, and find the set
   $
   S = {v in V | v "is reachable from" s "in" G_f}
   $
@@ -1128,7 +1128,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
   1. For some $(u, v) in E^arrow$, note that $(u, v) in.not E_f$. (If it were, then $v$ would be reachable from $s$ in $G_f$, contradicting $v in T$). This means, $c_f (u, v) = 0 => f(u, v) = c(u, v)$, thus $(u, v)$ is saturated.
   2. For some $(u, v) in E^arrow.l$, note that $(v, u) in.not E_f$. This means, $c_f (v, u) = 0 => f(v, u) = c(v, u) = 0$, thus $(u, v)$ is zeroed out.
 
-  The flow of the cut is 
+  The flow of the cut is
   $
   f(S, T) = sum_(u in S) sum_(v in T) f(u, v) = sum_((u, v) in E^arrow) f(u, v) + sum_((u, v) in E^arrow.l) f(v, u) = sum_((u, v) in E^arrow) c(u, v) = sum_(u in S) sum_(v in T) c(u, v) = c(S, T)
   $
@@ -1155,7 +1155,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
   $
   c'(S^*, T^*) <= c'(S, T)\
   (m + 1) c(S^*, T^*) + k^* <= (m + 1) c(S, T) + k\
-  
+
   c(S^*, T^*) + k^* /(m + 1) <= c(S, T) + k/(m + 1)
   $
   Here, both $k^*$ and $k$ are less than $m + 1$, and $c$ values are integral values. For the last inequality to hold, there are only these two cases:
@@ -1171,7 +1171,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
 
 #soln-box[
   Run a maximum flow algorithm and compute the maximum flow $f$.
-  
+
   Let $S^* = {v in V | v "is reachable from" s "in" G_f}$, $T^* = {v in V | t "is reachable from" v "in" G_f}$. Since $s$ and $t$ are disconnected, $S^* inter T^* = phi$
 
   *Lemma 5:* If $(S, T)$ is a min-cut, there can be no edge crossing the cut in $G_f$.
@@ -1229,8 +1229,8 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
   Let $P_1 = A - B$, $P_2 = A inter B$, $P_3 = B - A$ and $P_4 = V - A - B$. $P_i$s are mutually disjoint and partition the set of vertices $V$.
 
   $
-  delta(A) &= c(A, V - A) &&= c(P_1 union P_2, P_3 union P_4) = c(P_1, P_3) + c(P_2, P_3) + c(P_1, P_4) + c(P_2, P_4)\ 
-  delta(B) &= c(B, V - B) &&= c(P_2 union P_3, P_1 union P_4) = c(P_2, P_1) + c(P_3, P_1) + c(P_2, P_4) + c(P_3, P_4)\ 
+  delta(A) &= c(A, V - A) &&= c(P_1 union P_2, P_3 union P_4) = c(P_1, P_3) + c(P_2, P_3) + c(P_1, P_4) + c(P_2, P_4)\
+  delta(B) &= c(B, V - B) &&= c(P_2 union P_3, P_1 union P_4) = c(P_2, P_1) + c(P_3, P_1) + c(P_2, P_4) + c(P_3, P_4)\
   delta(A union B) &= c(A union B, V - A union B) &&= c(P_1 union P_2 union P_3,  P_4) = c(P_1, P_4) + c(P_2, P_4) + c(P_3, P_4)\
   delta(A inter B) &= c(A inter B, V - A inter B) &&= c(P_2, P_1 union P_3 union P_4) = c(P_2, P_1) + c(P_2, P_3) + c(P_2, P_4)\
   $
@@ -1242,12 +1242,12 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
   &= delta(A union B) + delta(A inter B)
   $
 ]
-    
+
 13. *[Edge in Every Min Cut]* Given a flow network, design an algorithm of worst-case time complexity $O("time complexity of maximum" s − t "flow computation")$ that identifies all edges that belong to *every* minimum $s − t$ cut.
 
 #soln-box[
  Run a maximum flow algorithm and compute the maximum flow $f$.
-  
+
   Let $S^* = {v in V | v "is reachable from" s "in" G_f}$, $T^* = {v in V | t "is reachable from" v "in" G_f}$.
 
   Compute $S^*$ and $T^*$ by running BFS on the residual graph and its reverse graph respectively. Iterate over all edges, and check whether $u in S^*$ and $v in T^*$, if so, then $(u, v)$ belongs to every min-cut of $G$.
@@ -1286,7 +1286,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
 #soln-box[
     #set enum(numbering: "(a)")
   + #[
-    
+
     Let $f$ be a flow in $G$. We define a new flow $f' = f$. Define the flow subgraph $G^+$ containing only edges with positive flow, $f'(u, v) > 0$.
 
     While $G^+$ has a directed cycle $C$,
@@ -1294,11 +1294,11 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
     - For every edge $e in C$, update $f'(e) <- f'(e) - delta$.
     - The flow of an edge becomes zero, which gets removed from $G^+$.
 
-    This procedure will terminate in at most $m$ iterations since on each iteration one edge gets removed from the graph $G^+$. 
+    This procedure will terminate in at most $m$ iterations since on each iteration one edge gets removed from the graph $G^+$.
 
     $f'$ is a valid flow since for each node in the cycle, one incoming edge and one outgoing edge is depleted of $delta$ flow on each iteration.
-    
-    The resulting flow $f'$ is acyclic flow, since the flow graph $G^+$ does not contain any directed cycle at the end of the algorithm. 
+
+    The resulting flow $f'$ is acyclic flow, since the flow graph $G^+$ does not contain any directed cycle at the end of the algorithm.
 
     The value of the flow is same as that of the original, since we do not modify the flow of any edge connected to $s$ -- under our assumptions, $s$ can't be a part of a directed cycle.
   ]
@@ -1316,7 +1316,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
 
     Also, at the end of the procedure, (when there is no $s-t$ path in $G^+$), $f'$ must be the zero flow.
 
-    Assume it is not, so there exists some $(u, v) in E$, $f(u, v) > 0$. Since $v$ has an incoming positive flow, it must have an outgoing positive flow through some edge $(v, v_1)$.  Repeating this argument, we can find a sequence $v, v_1, v_2, ...$. Now, no vertex can repeat in this sequence, otherwise we will have a directed cycle with positive flow, which is not allowed. So the only other option is that this sequence terminates at $t$. 
+    Assume it is not, so there exists some $(u, v) in E$, $f(u, v) > 0$. Since $v$ has an incoming positive flow, it must have an outgoing positive flow through some edge $(v, v_1)$.  Repeating this argument, we can find a sequence $v, v_1, v_2, ...$. Now, no vertex can repeat in this sequence, otherwise we will have a directed cycle with positive flow, which is not allowed. So the only other option is that this sequence terminates at $t$.
 
     Similarly, traceback the vertex $u$ to $u_1, u_2, u_3, ...$, this leads to this sequence terminating at $s$. Therefore, we have found an $s-t$ path: $s arrow.squiggly u -> v arrow.squiggly t$, which is a contradiction. So, $f'$ is indeed the zero flow.
 
@@ -1324,7 +1324,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
   ]
 
   + #[
-    
+
   #let d1 = diagram(
     node-shape: circle,
     node-stroke: 1pt,
@@ -1337,7 +1337,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
     node((2, -1), $v_4$, name: "v4")
     node((3, 0), $v_3$, name: "v3")
     node((4, 0), $t$, name: "t")
-  
+
     edge(<s>, <v4>, "-|>", $2$)
     edge(<s>, <v2>, "-|>", $2$, label-side: right)
     edge(<v4>, <v1>, "-|>", $2$, label-side: left)
@@ -1349,11 +1349,11 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
   }, spacing: 0.8cm)
 
   No. We show a counter-example:
-  
+
   #figure(d1, caption: [A network for which #op("Ford-Fulkerson") may not find a acyclic flow.])
 
   On this network, if we choose the path $chevron.l s, v_2, v_3, v_4, t chevron.r$ on the first iteration, and $chevron.l s, v_4, v_1, v_2, t chevron.r$ on the second iteration, we will end up with a flow which is not acyclic, since there is a directed cycle with positive flow, $v_1, v_2, v_3, v_4$.
-  
+
 ]
 
 + #[
@@ -1364,13 +1364,13 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
 
 
   While $f' != 0$,
-  - Perform DFS from $s$ on $G^+$. 
+  - Perform DFS from $s$ on $G^+$.
     - If a back edge is encountered, we have a directed cycle.
-      - Decrease the flow of each edge in the cycle by $delta$, the bottleneck edge. 
+      - Decrease the flow of each edge in the cycle by $delta$, the bottleneck edge.
       - Store this as a cycle flow.
       - Restart the DFS.
     - If $t$ is reached, we have a $s-t$ path.
-      - Decrease the flow of each edge in the path by $delta$, the bottleneck edge. 
+      - Decrease the flow of each edge in the path by $delta$, the bottleneck edge.
       - Store this as a path flow.
       - Restart the DFS.
 
@@ -1381,7 +1381,7 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
 16. *[Dinic's Algorithm]* A _blocking flow_ $f$ in a flow network $G(V, E, c : E -> RR_(>0))$ is a flow such that, in every $s$ − $t$ path, there is at least one edge $e$ such that $c_e = f_e$.
     #set enum(numbering: "(a)")
     1. Given a network $G$, and an $s$ − $t$ flow $f$, construct the BFS tree starting from $s$. Delete backward and cross edges of the BFS tree from the residual graph $G_f$. We call the resulting graph the layered graph $cal(L)_f$ with respect to $f$. Prove that $cal(L)_f$ is acyclic.
-    2. Design an $O(m n)$-time algorithm to compute a blocking flow $f$ in $cal(L)_f$. _Hint: Modify the standard DFS appropriately!_ 
+    2. Design an $O(m n)$-time algorithm to compute a blocking flow $f$ in $cal(L)_f$. _Hint: Modify the standard DFS appropriately!_
     3. Consider the following algorithm for computing a maximum flow in a network. Start with the zero flow. Compute a blocking flow in the corresponding layered graph, augment it with the current flow, and iterate until there is no path from $s$ to $t$ in the residual graph. Prove that the run time of this algorithm $O(m n^2)$. _Hint: How does the distance (number of edges in a shortest path) of any vertex from s changes after every iteration?_
 
 
@@ -1397,22 +1397,22 @@ Next up, we will look at a different paradigm for solving max-flow problems, whi
     ]
 
     + #[
-      To compute the blocking flow in $O(m n)$ time, we use a modified Depth First Search (DFS) with a "current-edge pointer" for each vertex. 
+      To compute the blocking flow in $O(m n)$ time, we use a modified Depth First Search (DFS) with a "current-edge pointer" for each vertex.
       #set enum(numbering: "1.")
 
       *Algorithm:*
-      1. For each vertex $u in V$, initialize a pointer `ptr[u]` pointing to the first outgoing edge in its adjacency list in $cal(L)_f$. 
+      1. For each vertex $u in V$, initialize a pointer `ptr[u]` pointing to the first outgoing edge in its adjacency list in $cal(L)_f$.
       2. Start a DFS from $s$. At the current vertex $u$, look at the edge $e = (u, v)$ pointed to by `ptr[u]`.
-      3. If $c_f (e) > 0$, we advance our DFS to $v$. 
-      4. If we reach $t$, we have found an $s-t$ path in $cal(L)_f$. 
+      3. If $c_f (e) > 0$, we advance our DFS to $v$.
+      4. If we reach $t$, we have found an $s-t$ path in $cal(L)_f$.
          - Find the bottleneck capacity $delta$ of this path.
          - Augment the flow along this path by $delta$, updating the residual capacities. (This saturates at least one edge).
          - Restart the DFS from $s$.
 5. Let $e = (u, v)$. If $c_f (e) = 0$, or if $v$ is a dead end (meaning `ptr[v]` has reached the end of its adjacency list or it has no outgoing edges), then increment `ptr[u]` and restart the DFS from $s$.
-6. The algorithm terminates when `ptr[s]` reaches the end of $s$'s adjacency list. 
+6. The algorithm terminates when `ptr[s]` reaches the end of $s$'s adjacency list.
 
 *Complexity:*
-Because we never reset `ptr[u]`, an edge is removed permanently once it is saturated or leads to a dead end. 
+Because we never reset `ptr[u]`, an edge is removed permanently once it is saturated or leads to a dead end.
 Every DFS starts from $s$ and takes at most $n$ steps. Each DFS run can end in these ways:
   - It reaches $t$. We augment flow, which removes at least one edge from $cal(L)_f$. Since there are at most $m$ edges, this happens at most $m$ times. Time spent on this case across the whole algorithm is bounded by $m times O(n) = O(m n)$.
   - It hits a dead end (or a saturated edge). We advance `ptr[u]` and discard that edge from future consideration. Since there are at most $m$ edges, `ptr` arrays can be advanced at most $m$ times total. Time spent on this case is bounded by $m times O(n) = O(m n)$.
@@ -1421,25 +1421,23 @@ Every DFS starts from $s$ and takes at most $n$ steps. Each DFS run can end in t
     ]
 
     + #[
-      To prove the $O(m n^2)$ runtime, we must bound the total number of blocking flow iterations. 
+      To prove the $O(m n^2)$ runtime, we must bound the total number of blocking flow iterations.
 
-      Let $ell(v)$ be the shortest path distance (number of edges) from $s$ to $v$ in $G_f$. By definition, every edge $(u, v)$ in $cal(L)_f$ strictly satisfies $ell(v) = ell(u) + 1$. 
+      Let $ell(v)$ be the shortest path distance (number of edges) from $s$ to $v$ in $G_f$. By definition, every edge $(u, v)$ in $cal(L)_f$ strictly satisfies $ell(v) = ell(u) + 1$.
 
-      When we compute and augment a blocking flow in $cal(L)_f$, we saturate at least one edge on *every* possible shortest $s-t$ path. Therefore, in the new residual graph $G_f'$, no $s-t$ paths exist that are made entirely of the forward edges from the previous $cal(L)_f$. 
+      When we compute and augment a blocking flow in $cal(L)_f$, we saturate at least one edge on *every* possible shortest $s-t$ path. Therefore, in the new residual graph $G_f'$, no $s-t$ paths exist that are made entirely of the forward edges from the previous $cal(L)_f$.
 
-      Any newly created edges in $G_f'$ are backward edges $(v, u)$, which point strictly backwards relative to the distance layering: $ell(u) = ell(v) - 1$. 
+      Any newly created edges in $G_f'$ are backward edges $(v, u)$, which point strictly backwards relative to the distance layering: $ell(u) = ell(v) - 1$.
 
-      For a new $s-t$ path to exist in $G_f'$, it must use either these backward edges or cross edges (where $ell(v) <= ell(u)$). Because traversing these edges does not optimally increase the distance from $s$ by $1$ at each step, any valid $s-t$ path in $G_f'$ must require strictly more edges than the shortest path in $G_f$. 
+      For a new $s-t$ path to exist in $G_f'$, it must use either these backward edges or cross edges (where $ell(v) <= ell(u)$). Because traversing these edges does not optimally increase the distance from $s$ by $1$ at each step, any valid $s-t$ path in $G_f'$ must require strictly more edges than the shortest path in $G_f$.
 
-      Thus, after every iteration of augmenting a blocking flow, the shortest path distance $d(t)$ strictly increases. 
+      Thus, after every iteration of augmenting a blocking flow, the shortest path distance $d(t)$ strictly increases.
       $ d_f' (t) > d_f (t) $
 
       Since the maximum possible length of a simple path in a graph with $n$ vertices is $n - 1$, the distance $d(t)$ can strictly increase at most $n - 1$ times before $s$ and $t$ become completely disconnected.
 
-      This guarantees there are at most $O(n)$ blocking flow iterations. 
+      This guarantees there are at most $O(n)$ blocking flow iterations.
       Since each iteration computes a blocking flow in $O(m n)$ time (from part b), the total time complexity of Dinic's Algorithm is:
       $ O(n) "iterations" times O(m n) "time per iteration" = O(m n^2) $
     ]
 ]
-
-
