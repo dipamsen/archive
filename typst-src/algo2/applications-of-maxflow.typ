@@ -400,4 +400,403 @@ We have looked at some applications of the max-flow problem, how other problems 
 
 = Problems
 
-where are they #emoji.eyes
+#text(0.7em)[(pls try the problems first before looking at these solutions #emoji.hands (these are genuinely doable))]
+
+1. Using max flow, prove Menger's theorem: If an undirected graph remains connected after removing any set of fewer than $k$ edges, then the size of the minimum cut is at least $k$. A cut is a set of edges whose removal makes the graph disconnected.
+
+#soln-box[
+  Firstly, if an undirected graph remains connected after removing any set of fewer than $k$ edges, then the minimum number of edges I need to remove to disconnect the graph is at least $k$. There is nothing to prove here, it is self evident. Nor is this the statement of Menger's theorem.
+
+  (One version of) Menger's theorem states: *If an undirected graph remains connected after removing any set of fewer than $k$ edges, then there exist at least $k$ disjoint paths between any pair of vertices.*
+  - Two paths are disjoint if they do not share any edge.
+
+  Let $G$ be an undirected graph, such that on removal of any set of fewer than $k$ edges, $G$ remains connected. Consider any two arbitrary vertices of $G$, call them $s$ and $t$. Construct a network flow $G'$ by making all edges directed (antiparallel edges), and all edge capacities $1$, taking $s$ as the source and $t$ as the sink. Consider the size (number of edges) of the minimum $s-t$ cut in $G'$. It cannot be less than $k$, since if there is a cut with less than $k$ edges, by removing these edges from $G$ we can disconnect it, which is a contradiction. So, the size of the minimum $s-t$ cut in $G'$ must be $>= k$.
+
+  By the max-flow min-cut theorem, the value of the max flow in $G'$ should be at least $k$. Consider an integral max flow $f$ in $G'$. We can decompose $f$ into exactly $|f|$ path flows from $s$ to $t$, each with value $1$ (since no path flow can have a value more than 1). Also, no two of these path flows may share any edge, i.e. they must be disjoint. This is guaranteed by the fact that each edge has a capacity of $1$, so at no point other than $s$ or $t$, can flow combine / separate. Thus, this gives us at least $k$ disjoint paths in $G$ between $s$ and $t$.
+
+  Since $s$ and $t$ were chosen arbitrarily, this means we can get at least $k$ disjoint paths between any pair of vertices in $G$.
+]
+
+2. #[[KT book] Network flow issues come up in dealing with natural disasters and other crises, since major unexpected events often require the movement and evacuation of large numbers of people in a short amount of time.
+
+  Consider the following scenario. Due to large-scale flooding in a region, paramedics have identified a set of $n$ injured people distributed across the region who need to be rushed to hospitals. There are $k$ hospitals in the region, and each of the $n$ people needs to be brought to a hospital that is within a half-hour's driving time of their current location (so different people will have different options for hospitals, depending on where they are right now).
+
+  At the same time, one doesn't want to overload any one of the hospitals by sending too many patients its way. The paramedics are in touch by cell phone, and they want to collectively work out whether they can choose a hospital for each of the injured people in such a way that the load on the hospitals is _balanced_: Each hospital receives at most $ceil(n \/ k)$ people.
+
+  Give a polynomial-time algorithm that takes the given information about the people's locations and determines whether this is possible.]
+
+#soln-box[
+  First we abstract out the input information: We just need to know, for each of the $n$ people, what are the hospitals that they can visit. Compute this information beforehand. We need to find out if there exists a pairing of each person with one hospital (that they can visit), such that the total number of people visiting a hospital is at most $ceil(n/k)$.
+
+  Construct a bipartite graph $G = (V = (A union.plus B), E)$, with $A = {a_1, ..., a_n}$ representing $n$ people, and $B = {b_1, ..., b_k}$ representing $k$ hospitals. Add an edge between $(a_i, b_j)$ if person $a_i$ can reach hospital $b_j$ in time.
+
+  Construct a flow network $G'$ by adding a source $s$, a sink $t$, and edges from $(s, a_i)$ with capacity 1, and $(b_j, t)$ with capacity $ceil(n / k)$. Direct all existing edges $(a_i, b_j)$ to be from $A$ to $B$, with capacity $oo$. Find the value of the max-flow on $G'$ (by using any suitable polynomial time algorithm). If the value of the max-flow is $n$, then the answer is YES, otherwise NO.
+
+  Proof: If a integral max-flow of value $n$ exists, then this means for each $a_i$ an outgoing edge has flow $= 1$, which means each person is matched with one hospital (among the ones it can visit). Also, since outgoing capacity of each hospital is $ceil(n/k)$, this means that each hospital needs to cater to at most $ceil(n/k)$ people.
+]
+
+3. #[[KT book] Your friends have written a very fast piece of maximum-flow code based on repeatedly finding augmenting paths. However, after you’ve looked at a bit of output from it, you realize that it’s not always finding a flow of _maximum_ value. The bug turns out to be pretty easy to find; your friends hadn’t really gotten into the whole backward-edge thing when writing the code, and so their implementation builds a variant of the residual graph that _only includes the forward edges_. In other words, it searches for $s-t$ paths in a graph $G_f$ consisting only of edges $e$ for which $f(e) < c(e)$, and it terminates when there is no augmenting path consisting entirely of such edges. We’ll call this the Forward-Edge-Only Algorithm. (Note that we do not try to prescribe how this algorithm chooses its forward-edge paths; it may choose them in any fashion it wants, provided that it terminates only when there are no forward-edge paths.)
+
+It’s hard to convince your friends they need to reimplement the code. In addition to its blazing speed, they claim, in fact, that it never returns a flow whose value is less than a fixed fraction of optimal. Do you believe this? The crux of their claim can be made precise in the following statement.
+
+#emph[There is an absolute constant $b > 1$ (independent of the particular input flow network), so that on every instance of the Maximum-Flow Problem, the Forward-Edge-Only Algorithm is guaranteed to find a flow of value at least $1/b$ times the maximum-flow value (regardless of how it chooses its forward-edge paths).]
+
+Decide whether you think this statement is true or false, and give a proof of either the statement or its negation.]
+
+#soln-box[
+  Essentially, the Forward-Edge-Only algorithm finds a blocking flow $f$ on the graph $G$. (Recall, that a blocking flow is one where every $s$ to $t$ path in $G$ has at least one edge saturated. The Forward-Edge-Only algorithm continuously chooses some $s-t$ path and saturates its critical edge, until no $s-t$ path (with all non-saturated edges) exists. We do not add backward edges, so we are only concerned with $s-t$ paths that exist in $G$ itself.)
+
+  Intuitively, it feels that the answer should be no, i.e. we should be able to construct some network by which we can make the ratio of the flow values to be as small as possible, i.e. some blocking flow exists whose value is very small as compared to the optimal max flow's value.
+
+  We may start with constructing a graph where the Forward-Edge-Only algorithm might reach a blocking flow which isn't a max-flow.
+
+  #let augpath = arguments(stroke: (paint: primary-color, thickness: 2pt), mark-scale: 0.3)
+
+  #let d1 = diagram(
+    node-shape: circle,
+    node-stroke: 1pt,
+    mark-scale: 1.5,
+    node-fill: white,
+  {
+    node((0, 0), $s$, name: "s")
+    node((1, -1), $v_1$, name: "v1")
+    node((1, 1), $v_2$, name: "v2")
+    node((2, 0), $t$, name: "t")
+
+    edge(<s>, <v1>, "-|>", $3$)
+    edge(<s>, <v2>, "-|>", $2$, label-side: right)
+    edge(<v1>, <v2>, "-|>", $5$, label-side: left)
+    edge(<v1>, <t>, "-|>", $2$)
+    edge(<v2>, <t>, "-|>", $3$, label-side: right)
+  }, spacing: 0.8cm)
+
+  #let d2 = diagram(
+    node-shape: circle,
+    node-stroke: 1pt,
+    mark-scale: 1.5,
+    node-fill: white,
+  {
+    node((0, 0), $s$, name: "s")
+    node((1, -1), $v_1$, name: "v1")
+    node((1, 1), $v_2$, name: "v2")
+    node((2, 0), $t$, name: "t")
+
+    edge(<s>, <v1>, "-|>", $3 \/ 3$)
+    edge(<s>, <v2>, "-|>", $0 \/ 2$, label-side: right)
+    edge(<v1>, <v2>, "-|>", $3 \/ 5$, label-side: left)
+    edge(<v1>, <t>, "-|>", $0 \/2$)
+    edge(<v2>, <t>, "-|>", $3 \/3$, label-side: right)
+  }, spacing: 0.8cm)
+
+  #let d3 = diagram(
+    node-shape: circle,
+    node-stroke: 1pt,
+    mark-scale: 1.5,
+    node-fill: white,
+  {
+    node((0, 0), $s$, name: "s")
+    node((1, -1), $v_1$, name: "v1")
+    node((1, 1), $v_2$, name: "v2")
+    node((2, 0), $t$, name: "t")
+
+    edge(<s>, <v1>, "-|>", $3 \/ 3$)
+    edge(<s>, <v2>, "-|>", $2 \/ 2$, label-side: right)
+    edge(<v1>, <v2>, "-|>", $1 \/ 5$, label-side: left)
+    edge(<v1>, <t>, "-|>", $2 \/2$)
+    edge(<v2>, <t>, "-|>", $3 \/3$, label-side: right)
+  }, spacing: 0.8cm)
+
+  #figure(
+    grid(columns: 3, gutter: 3em, d1, d2, d3),
+    caption: [(a) A network $G$. (b) A possible flow $f$ obtained from Forward-Edges-Only, with value $3$. (c) A max flow $f^*$ with value $5$.]
+  )
+  Consider the network $G$ in Figure 7. Suppose it chooses the path $s -> v_1 -> v_2 -> t$ on its first iteration, then it augments its _residual graph_ (without backward edges) by the residual flow $c_f = 3$. Now, this path flow is a blocking flow in $G$, and it cannot proceed further in finding any more $s-t$ paths with all edges having positive residual capacity. So we have gotten a flow $f$ of value $3$. (Observe, that if we maintained a correct residual graph which had backward edges, then we do have a $s-t$ path: $s -> v_2 -> v_1 ->t$, augmenting by which we would arrive at the max-flow $f^*$, with value $5$).
+
+  The next thought is that just by tweaking the capacities of edges in this network, can we make the value of $|f| \/ |f^*|$ arbitrarily small? If so, then we are done. Let's generalise the edge capacities here and analyse.
+
+  #grid(
+    columns: (auto, 1fr),
+    gutter: 2em,
+    diagram(
+    node-shape: circle,
+    node-stroke: 1pt,
+    mark-scale: 1.5,
+    node-fill: white,
+  {
+    node((0, 0), $s$, name: "s")
+    node((1, -1), $v_1$, name: "v1")
+    node((1, 1), $v_2$, name: "v2")
+    node((2, 0), $t$, name: "t")
+
+    edge(<s>, <v1>, "-|>", $a$)
+    edge(<s>, <v2>, "-|>", $b$, label-side: right)
+    edge(<v1>, <v2>, "-|>", $c$, label-side: left)
+    edge(<v1>, <t>, "-|>", $b$)
+    edge(<v2>, <t>, "-|>", $a$, label-side: right)
+  }, spacing: 0.8cm))[
+
+    Let $a >= b$. For the max flow of this network to be $a + b$ (which is the maximum possible), we need to route $a - b$ flow through the $(v_1, v_2)$ edge. So we need $ c >= a - b $
+    Also, lets say we want $s -> v_1  -> v_2 -> t$ to be a blocking flow, then it should block the edges $(s, v_1)$, and $(v_2, t)$. For that, we will need $ c >= a $
+  ]
+
+  So, we have, $|f^*| = a + b <= 2 a$, and $|f| = a$. Then, $ (|f|) / (|f^*|) = a / (a + b) >= 1/2 $
+
+  So our approach doesn't work: On this graph, just by changing the edge capacities of the network, the Forward-Edges-Only algorithm will always output a flow whose value is at least $1/2 |f^*|$ or better.
+
+  But this gives another idea. Of course we can make our graph however we want. Maybe repeating a structure like this arbitrarily can decrease the lower bound of the ratio arbitrarily. So the high level idea is: For some given $k$, construct a network $G$, which has one blocking flow with (ideally) constant flow value, and its max flow value is linear in $k$. This suffices to prove what we need.
+
+  Here's one such construction: Let $k in ZZ_(>0)$. Define a network $G_k = (V_k, E_k)$ as follows:
+  - $V_k = {s, t} union {a_1, ..., a_k} union {b_1, ..., b_k}$
+  - $E_k = {(s, a_1), (b_1, a_2), (b_2, a_3), ..., (b_(k- 1), a_k), (b_k, t)} union {(a_1, b_1), (a_2, b_2), ..., (a_k, b_k)} union {(s, b_i) | 1 <= i <= k} union {(a_i, t) | 1 <= i <= k}$, all edges have capacity $1$.
+
+  (In order to make the flow linear in $k$ we add $O(k)$ nodes, and allow flow to pass through each node from $s$ to $t$ to get a max flow. To get a constant value blocking flow we use a similar idea as in the previous example, and keep a path from $s$ to $t$, upon saturation of which, no other $s-t$ path exists.)
+
+  #let augpath = arguments(stroke: (paint: primary-color, thickness: 2pt), mark-scale: 0.3)
+
+  #let d1 = diagram(
+    node-shape: circle,
+    node-stroke: 1pt,
+    mark-scale: 1.5,
+    node-fill: white,
+  {
+    node((0, 0), $s$, name: "s")
+    node((1, -1), $a_1$, name: "a1")
+    node((2, -1), $a_2$, name: "a2")
+    node((3, -1), $a_3$, name: "a3")
+    node((4, -1), $a_4$, name: "a4")
+    node((1, 1), $b_1$, name: "b1")
+    node((2, 1), $b_2$, name: "b2")
+    node((3, 1), $b_3$, name: "b3")
+    node((4, 1), $b_4$, name: "b4")
+    node((5, 0), $t$, name: "t")
+
+    edge(<s>, "-|>", <a1>, ..augpath)
+    edge(<a1>, "-|>", <b1>, ..augpath)
+    edge(<b1>, "-|>", <a2>, ..augpath)
+    edge(<a2>, "-|>", <b2>, ..augpath)
+    edge(<b2>, "-|>", <a3>, ..augpath)
+    edge(<a3>, "-|>", <b3>, ..augpath)
+    edge(<b3>, "-|>", <a4>, ..augpath)
+    edge(<a4>, "-|>", <b4>, ..augpath)
+    edge(<b4>, "-|>", <t>, ..augpath)
+
+    edge(<s>, "-|>", <b1>, bend: -30deg)
+    edge(<s>, "-|>", <b2>, bend: -60deg)
+    edge(<s>, "-|>", <b3>, bend: -65deg)
+    edge(<s>, "-|>", <b4>, bend: -70deg)
+    edge(<a4>, "-|>", <t>, bend: 30deg)
+    edge(<a3>, "-|>", <t>, bend: 60deg)
+    edge(<a2>, "-|>", <t>, bend: 65deg)
+    edge(<a1>, "-|>", <t>, bend: 70deg)
+  }, spacing: (0.5cm, 0.5cm))
+
+  #let d2 = diagram(
+    node-shape: circle,
+    node-stroke: 1pt,
+    mark-scale: 1.5,
+    node-fill: white,
+  {
+    node((0, 0), $s$, name: "s")
+    node((1, -1), $a_1$, name: "a1")
+    node((2, -1), $a_2$, name: "a2")
+    node((3, -1), $a_3$, name: "a3")
+    node((4, -1), $a_4$, name: "a4")
+    node((1, 1), $b_1$, name: "b1")
+    node((2, 1), $b_2$, name: "b2")
+    node((3, 1), $b_3$, name: "b3")
+    node((4, 1), $b_4$, name: "b4")
+    node((5, 0), $t$, name: "t")
+
+    edge(<s>, "-|>", <a1>, ..augpath)
+    edge(<a1>, "-|>", <b1>)
+    edge(<b1>, "-|>", <a2>, ..augpath)
+    edge(<a2>, "-|>", <b2>)
+    edge(<b2>, "-|>", <a3>, ..augpath)
+    edge(<a3>, "-|>", <b3>)
+    edge(<b3>, "-|>", <a4>, ..augpath)
+    edge(<a4>, "-|>", <b4>)
+    edge(<b4>, "-|>", <t>, ..augpath)
+
+    edge(<s>, "-|>", <b1>, bend: -30deg, ..augpath)
+    edge(<s>, "-|>", <b2>, bend: -60deg, ..augpath)
+    edge(<s>, "-|>", <b3>, bend: -65deg, ..augpath)
+    edge(<s>, "-|>", <b4>, bend: -70deg, ..augpath)
+    edge(<a4>, "-|>", <t>, bend: 30deg, ..augpath)
+    edge(<a3>, "-|>", <t>, bend: 60deg, ..augpath)
+    edge(<a2>, "-|>", <t>, bend: 65deg, ..augpath)
+    edge(<a1>, "-|>", <t>, bend: 70deg, ..augpath)
+  }, spacing: (0.5cm, 0.5cm))
+
+  #figure(grid(columns: 2, gutter: 2em, d1, d2), caption: [Construction of $G_k$ for $k = 4$. All edge capacities are $1$. (a) The highlighted edges form a blocking flow $f$, $|f| = 1$. (b) The highlighted edges form a max flow $f^*$, $|f^*| = 5$.])
+
+  Suppose the Forward-Edges-Only algorithm pickes the path: $s -> a_1 -> b_1 -> ... -> a_k -> b_k -> t$. Then, since all edges in this path have capacity $1$, all of them get saturated, so all these edges get removed from the residual graph. As no backward edges are added, no other $s-t$ path exists and the algorithm terminates here, with a flow $f$ having value of $|f| = 1$.
+
+  We can clearly show that the value of the max flow is $k + 1$: By saturating these paths: $s -> a_1 -> t$, $s -> b_1 -> a_2 -> t$, ..., $s -> b_k -> t$, we can get a flow $f^*$ with value $|f^*| = k + 1$. This is a max flow because the capacity of the $(s, V - s)$ cut is also $k + 1$.
+
+  So, we have achieved our goal. Now, just for formalities:
+
+  *Solution:*
+
+  The statement is false.
+
+  Suppose for contradiction, there does exist some $b > 1$, such that for any flow network $G$, the Forward-Edges-Only algorithm is guaranteed to find a flow of value at least $1/b$ times the max-flow value.
+
+  Let $k = ceil(b)$. Construct $G_k$ as shown. Suppose the forward edges algorithm chooses the path $s -> a_1 -> b_1 -> ... -> a_k -> b_k -> t$. Then, once it augments by this path, there are no other $s-t$ path which only use forward residual edges, so the algorithm terminates with this flow $f$ having value $1$.
+
+  We have shown that $G_k$ has a maximum flow value of $|f^*| = k + 1$.
+
+  By our hypothesis, we know that the ratio of the $|f|$ and $|f^*|$ must be at least $1/b$. So,
+
+  $
+    frac(|f|, |f^*|) >= 1/b\
+    => 1/(k + 1) >= 1/b\
+    => b >= k + 1 > b\
+  $
+  which is a contradiction. Hence, there does not exist any such absolute constant $b$.
+]
+
+4. [KT book] We define the _Escape Problem_ as follows. We are given a directed graph $G = (V, E)$ (picture a network of roads). A certain collection of nodes $X subset.eq V$ are designated as _populated nodes_, and a certain other collection $S subset.eq V$ are designated as _safe nodes_. (Assume that $X$ and $S$ are disjoint.) In case of an emergency, we want evacuation routes from the populated nodes to the safe nodes. A set of evacuation routes is defined as a set of paths in $G$ so that (i) each node in $X$ is the start of one path, (ii) the last node on each path lies in $S$, and (iii) the paths do not share any edges. Such a set of paths gives a way for the occupants of the populated nodes to "escape" to $S$, without overly congesting any edge in $G$.
+  #set enum(numbering: "(a)")
+  + Given $G$, $X$, and $S$, show how to decide in polynomial time whether such a set of evacuation routes exists.
+  + Suppose we have exactly the same problem as in (a), but we want to enforce an even stronger version of the "no congestion" condition (iii). Thus we change (iii) to say "the paths do not share any nodes." With this new condition, show how to decide in polynomial time whether such a set of evacuation routes exists. Also, provide an example with the same $G$, $X$, and $S$, in which the answer is yes to the question in (a) but no to the question in (b).
+
+#soln-box[
+  (a) Construct a graph $G' = (V union {s, t}, E')$, $E' = E union {(s, x) | x in X} union {(v, t) | v in S}$. (Add a source $s$ and sink $t$, add edges from $s$ to all vertices in $X$, and from all vertices in $S$ to $t$). The original edges in $E$ have a capacity $1$. Newly added edges from $s$ have a capacity of $1$, while newly added edges to $t$ have a capacity $oo$.
+
+  Run a polynomial time max-flow algorithm on this graph. If the max-flow value is equal to $|X|$, then such a set of evacuation routes exists, otherwise they don't.
+
+  *Proof:*
+  1. #[If such a set of escape routes exist in $G$, then the max flow value is $|X|$ in $G'$.
+
+    Assume there is a valid set of $|X|$ escape routes, one starting at each vertex in $X$. We can construct a flow $f$ by setting $f(e) = 1$ if $e$ is used in any of these routes, $f(e) = 0$ otherwise, and set $x_i in X, f(s, x_i) = 1$ and $s_j in S, f(s_j, t) = $ sum of incoming flow to $s_j$. Clearly this flow does not violate capacity constraints, and also flow conservation, for every non $S$ non $X$ vertex they are intermediate vertices in the paths, so the number of incoming flow edges is same as the number of outgoing flow edges for these vertices (the paths are edge-disjoint). For $X$ vertices, they each have exactly one outgoing flow edge, so their incoming flow is also $1$ ($f(s, x_i) = 1$). For $S$ vertices, flow conservation  holds by the assignment of flow in $f(s_j, t)$. The value of this flow is $|X|$ since $f(s, V - s) = |X|$, and this is also a max-flow since $c(s, V - s) = |X|$.
+  ]
+
+  2. #[If the value of the max flow of $G'$ is $|X|$, then such a set of escape routes exist in $G$.
+
+    Let $f$ be a integral max flow of $G'$, $|f| = |X|$. We can decompose this flow $f$ into a set of $|f|$ path flows from $s->t$, all of which have a value of $1$. (See proof of problem 1). Since no edge $e in E$ can exist in two of these paths (otherwise the value of flow in $e$ will be $> 1$), thus we get $|X|$ edge-disjoint paths, (drop $s$ and $t$ from these paths), which start at a vertex in $X$ and end at a vertex in $S$.
+  ]
+
+  (b) Observe, that to ensure no two paths go through the same edge, we enforced edge capacities to be $1$. Now, we are looking for vertex-disjoint paths, i.e. no two paths must use the same vertex. Recall in a previous module, we have shown that a network with vertex and edge capacities can be converted into an equivalent network having only edge capacities, such that their max-flow values are the same.
+
+  Construct a graph $G' = (V union {s, t}, E')$, $E' = E union {(s, x) | x in X} union {(v, t) | v in S}$ as usual. Set all edge capacities to $oo$, all vertex capacities to $1$ (other than $s$ and $t$). Compute a max-flow in $G'$ (by first converting into a edge-capacity network). If the value of the max-flow is $|X|$, then such a set of evacuating paths exist, otherwise they don't.
+
+  *Proof:*
+
+
+  1. #[If such a set of escape routes exist in $G$, then the max flow value is $|X|$ in $G'$.
+
+    Assume there is a valid set of $|X|$ escape routes, one starting at each vertex in $X$. Construct a flow $f$ by setting $f(e) = 1$ if $e$ is used in one of the paths. Note that being vertex disjoint implies that the paths are also edge-disjoint, since otherwise the same vertex would be used in multiple paths. Capacity conservation and flow conservation holds as before, and the value of this flow is $|X|$. This is a max flow because $c(s, V - s) = |X|$.
+  ]
+
+  2. #[If the value of the max flow of $G'$ is $|X|$, then such a set of escape routes exist in $G$.
+
+    Let $f$ be a integral max flow of $G'$, $|f| = |X|$. We can decompose this flow $f$ into a set of $|f|$ path flows from $s->t$, all of which have a value of $1$. No two of these paths share a vertex $v$, as otherwise the incoming flow to $v$ would be $> 1$ which is not possible since the capacity of $v$ is $1$. So we get a vertex-disjoint set of paths from $|X|$ to $|S|$.
+  ]
+
+  *Example of a graph where (a) is true but (b) is false:*
+
+  #figure(diagram(
+    node-shape: circle,
+    node-stroke: 1pt,
+    mark-scale: 1.5,
+    node-fill: white,
+  {
+    node((0, 0), $x_1$, name: "x1")
+    node((0, 2), $x_2$, name: "x2")
+
+    node((1, 1), $v$, name: "v")
+
+    node((2, 0), $s_1$, name: "s1")
+    node((2, 2), $s_2$, name: "s2")
+
+    edge(<x1>, "-|>", <v>)
+    edge(<x2>, "-|>", <v>)
+    edge(<v>, "-|>", <s1>)
+    edge(<v>, "-|>", <s2>)
+  }, spacing: 0.5cm), caption: [Example where there  exists edge-disjoint set of evacuating paths, but no vertex-disjoint set of evacuating paths.])
+
+  Let $G = (V, E)$, $V = X union S union {v}$, $X = {x_1, x_2}$, $S = {s_1, s_2}$. $E = {(x_1, v), (x_2, v), (v, s_1), (v, s_2)}$
+
+  For the above graph $G$, for part (a) we can find the following set of edge-disjoint evacuating paths: $x_1 -> v -> s_1$ and $x_2 -> v -> s_2$. But for part (b) there do not exist any vertex-disjoint evacuating paths for each $x in X$ reaching some vertex in $S$.
+
+]
+
+5. #[[KT book] You’ve been called in to help some network administrators diagnose the extent of a failure in their network. The network is designed to carry traffic from a designated source node $s$ to a designated target node $t$, so we will model the network as a directed graph G = (V, E), in which the capacity of each edge is $1$ and in which each node lies on at least one path from $s$ to $t$.
+
+  Now, when everything is running smoothly in the network, the maximum $s-t$ flow in G has value k. However, the current situation (and the reason you’re here) is that an attacker has destroyed some of the edges in the network, so that there is now no path from $s$ to $t$ using the remaining (surviving) edges. For reasons that we won’t go into here, they believe the attacker has destroyed only $k$ edges, the minimum number needed to separate $s$ from $t$ (i.e., the size of a minimum $s-t$ cut); and we’ll assume they’re correct in believing this.
+
+  The network administrators are running a monitoring tool on node $s$, which has the following behavior. If you issue the command $"ping"(v)$, for a given node $v$, it will tell you whether there is currently a path from $s$ to $v$. (So $"ping"(t)$ reports that no path currently exists; on the other hand, $"ping"(s)$ always reports a path from $s$ to itself.) Since it’s not practical to go out and inspect every edge of the network, they’d like to determine the extent of the failure using this monitoring tool, through judicious use of the ping command.
+
+  So here’s the problem you face: Give an algorithm that issues a sequence of _ping_ commands to various nodes in the network and then reports the _full_ set of nodes that are not currently reachable from $s$. You could do this by pinging every node in the network, of course, but you’d like to do it using many fewer pings (given the assumption that only $k$ edges have been deleted). In issuing this sequence, your algorithm is allowed to decide which node to ping next based on the outcome of earlier _ping_ operations.
+
+  Give an algorithm that accomplishes this task using only $O(k log n)$ pings.
+]
+
+#soln-box[
+
+  What does $k log n$ operations suggest? Also look at problem 1...
+
+  *Solution*
+
+  Firstly, note that the $k$ edges that are removed must be a min-cut. That is, there is some min-cut $(S, T)$, and the edges that are removed are all the edges crossing this cut.
+
+  By Menger's theorem (Problem 1), the value of the max-flow of $G$ is $k$. Thus, there exist at least $k$ edge-disjoint paths from $s$ to $t$ in $G$. Since $k$ edges are removed in total, and at least one edge must be removed from each of these paths (otherwise there will still remain a $s-t$ path in the graph). Therefore, from each of these paths exactly one edge must have been removed.
+
+  Consider one such path $p = chevron.l s, v_1, v_2, ..., v_m, t chevron.r$. Suppose that the edge $(v_i, v_(i + 1))$ was removed from this path. Then, what will be the outcome of $"ping"(v)$ for each vertex in path $p$? Clearly, for $v_1, v_2, ..., v_i$, ping will report a path from $s$ to $v$ exists, whereas, for $v_(i + 1), ..., v_m$, ping reports that no path exists (why?). This is a monotonic function, which means we can binary search over these vertices! Say we want to know the highest index vertex $v_i$, such that $v_i$ is reachable from $s$. Then, perform a standard binary search on the range ${1, ..., l}$:
+
+  - $l = 0, r = m$
+  - #While $l < r$, let mid = $floor((l + r + 1) \/ 2)$
+    - ping($v_"mid"$).
+    - #If reachable, then $l = "mid"$
+    - #Else, $r = "mid" - 1$
+
+  Finally, $l$ has the value of $i$ such that $v_i$ is the highest indexed vertex reachable from $s$. This takes $O(log m) = O(log n)$ ping operations to find out. Once we know this, we know that $(v_i, v_(i + 1))$ was the edge that was removed.
+
+  Doing this for all $k$ paths takes $O(k log n)$ operations, after which we know exactly the $k$ edges that were removed. Once we know this, we can exactly compute the reachable nodes from $s$ after the removal of these $k$ edges.
+
+]
+
+
+6. #[[KT book] Let $M$ be an $n times n$ matrix with each entry equal to either $0$ or $1$. Let $m_(i j)$ denote the entry in row $i$ and column $j$. A diagonal entry is one of the form $m_(i i)$ for some $i$.
+
+  _Swapping_ rows $i$ and $j$ of the matrix $M$ denotes the following action: we swap the values $m_(i k)$ and $m_(j k)$ for $k = 1, 2, . . . , n$. Swapping two columns is defined analogously.
+
+We say that $M$ is _rearrangeable_ if it is possible to swap some of the pairs of rows and some of the pairs of columns (in any sequence) so that, after all the swapping, all the diagonal entries of $M$ are equal to 1.
+  #set enum(numbering: "(a)")
+  + Give an example of a matrix $M$ that is not rearrangeable, but for which at least one entry in each row and each column is equal to 1.
+  + Give a polynomial-time algorithm that determines whether a matrix $M$ with $0-1$ entries is rearrangeable.]
+
+#set math.mat(delim: "[")
+#soln-box[
+
+  (a) Initially, it might seem that it is not possible to construct such a matrix (actually, I came up with this counter example only after solving (b)), but just jotting down something on paper and trying things out will lead to a counter example, such as this:
+
+  $
+    M = mat(1, 0, 0, 0; 1, 0, 0, 0; 1, 0, 0, 0; 1, 1, 1, 1)
+  $
+
+  (b) First observation: The swapping operation is reversible. So if some matrix $M$ is rearrangeable, that means that from a matrix with all ones in the diagonal entries, we can perform some swaps and reach $M$.
+
+  $
+    mat(1, X, X, X; X, 1, X, X; X, X, 1, X; X, X, X, 1) -->^"some swaps" M
+  $
+
+  Second observation: Track the positions of these $n$ diagonal ones throughout these swaps. Since initially the $i$th and $j$th one are in different row and different column, they continue to remain in different row and column. (by the definition of the swapping operations). For e.g., one possible $M$ which is rearrangeable can be of the form
+
+  $
+    M = mat(X, 1, X, X; 1, X, X, X; X, X, X, 1; X, X, 1, X)
+  $
+
+  Then, we have a characterisation: If there exists permutations $i_1, ..., i_n$ and $j_1, ..., j_n$, such that $m_(i_k, j_k) = 1$ for all $k$, then $M$ is rearrangeable.
+
+  Does that sound familiar?
+
+  *Solution:*
+
+  Construct a bipartite graph $G = (A union.plus B, E)$, $A = {a_1, a_2, ..., a_n}$, $B = {b_1, b_2, ..., b_n}$, $E = {(a_i, b_j) | m_(i j) = 1}$. (Add edges between $a_i$ and $b_j$ if $m_(i j) = 1$.) If $G$ has a perfect matching, then $M$ is rearrangeable, otherwise it is not.
+
+  Proof: Suppose $G$ has a perfect matching. Then, let that matching have edges $(a_1, b_pi_1), (a_2, b_pi_2), ..., (a_n, b_pi_n)$. This means, for all $i = 1, 2, ..., n$, we have $m_(i, pi_i) = 1$, i.e. in the $i$th row, the $pi_i$th entry is a $1$. (All $pi_i$s are distinct.) Now, we need to rearrange it to get all these ones in the diagonal cells. So, there exists some sequence of swaps (on columns) so that on row $i$, the 1 at $pi_i$ comes to $i$. For each $i$ from $1, 2, ..., n$, one may simply greedily keep swapping column $i$ with the column to the right, where the specific 1 exists in that row (which started at $(i, pi_i)$). Finally we reach a matrix with all diagonal elements as 1.
+
+  Suppose $M$ is rearrangeable. Then (as discussed above), there exists a sequence of swaps starting from some matrix with all diagonal elements 1, which finally reach $M$. Then, there exists permutations $i_1, ..., i_n$ and $j_1, ..., j_n$ such that $m_(i_k, j_k) = 1$ for all $k = 1, 2, ..., n$. Then, in $G$, consider $M = {(a_i_k, b_i_k) | k = 1, 2, ..., n}$. This is a perfect matching.
+
+]

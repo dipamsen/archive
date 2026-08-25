@@ -427,7 +427,7 @@ Here, the initialization step runs in linear time. So, the main section affectin
 
 Both the #push operation and the #relabel operation runs in constant time. This is evident from the description of these operations themselves. The only other thing happening in an iteration of the loop, is to find the max-height vertex having positive excess flow (line 3). If we can find this in $O(1)$ time, then we can claim that the algorithm runs in $O(n^3)$ time complexity.
 
-In problem 1, we see that we can keep a data structure of vertices such that we can achieve $O(1)$ amortized selection of the max-height vertex with positive excess flow. Therefore, we get $O(n^3)$ running time of the #op("Push-Relabel") algorithm.
+In problem 1, we see that we can simply keep the vertices with non-zero excess into collections by their height, such that we can achieve $O(1)$ amortized selection of the max-height vertex with positive excess flow. Therefore, we get $O(n^3)$ running time of the #op("Push-Relabel") algorithm.
 
 As compared to Dinic's algorithm (which was an augmenting path algorithm) which runs in $O(m n^2)$ time, this is an asymptotic improvement to its time complexity, especially for dense graphs.
 
@@ -440,4 +440,32 @@ As compared to Dinic's algorithm (which was an augmenting path algorithm) which 
 
 = Problems
 
-where are they #emoji.eyes
+there are none :)
+
+but the text talks about a problem 1 so here it is anyways
+
+1. Design/use a suitable data structure so that the push relabel algorithm takes $O(n^3)$ time.
+
+#soln-box[
+  Call a vertex having positive excess flow 'active'.
+
+  We have established, that if we can somehow find the highest active vertex (line 3) in $O(1)$ amortized time, then our algorithm runs in $O(n^3)$.
+
+  We will store the *active vertices* in a collection of buckets, indexed by their height. So, create a array $B[]$ of linked lists of size $2 n + 1$, representing the heights of the vertices from $0$ to $2 n$. Each entry $B[h]$ is a doubly linked list of all active vertices currently at height $h$.
+
+  Store a value `max_h` which is the highest index of a bucket which is non-empty (contains at least one vertex).
+
+  *Operations:*
+  - On #push, at most one vertex may become inactive ($O(1)$ deletion from a doubly linked list), at most one vertex may become active ($O(1)$ insertion into a linked list).
+  - On #relabel, the height of a vertex changes, which involves deletion from one bucket and insertion to another bucket.
+  - Whenever we insert a vertex to a linked list, if its $h > #[`max_h`]$, update `max_h`. Whenever we delete from $h = #[`max_h`]$, if the list becomes empty, reduce `max_h` to the next non empty bucket.
+
+  *Choosing the highest active vertex:*
+  Choose the vertex at the head of the $B[#[`max_h`]]$ list. ($O(1)$)
+
+  In total, on each iteration, there are $O(1)$ insertions and deletions, all of which will run in constant time. The only other thing is decrementing of `max_h` when we delete a vertex from `max_h`, and its list becomes empty. Observe that `max_h` can only increase during a #relabel operation (and that too by at most $1$). Since the total number of relabel operations are $O(n^2)$, the total number of increments to `max_h` is at most $O(n^2)$. So, there can be at most $O(n^2)$ decrements to `max_h` throughout the algorithm. Since there are $O(n^3)$ iterations in total, the cost for decrementing amortizes to $O(1)$ per iteration.
+
+  Thus, the total running time of the algorithm is $O(n^3)$.
+
+
+]
