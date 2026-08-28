@@ -400,19 +400,17 @@ We have looked at some applications of the max-flow problem, how other problems 
 
 = Problems
 
-#text(0.7em)[(pls try the problems first before looking at these solutions #emoji.hands (these are genuinely doable))]
-
 1. Using max flow, prove Menger's theorem: If an undirected graph remains connected after removing any set of fewer than $k$ edges, then the size of the minimum cut is at least $k$. A cut is a set of edges whose removal makes the graph disconnected.
 
 #soln-box[
-  Firstly, if an undirected graph remains connected after removing any set of fewer than $k$ edges, then the minimum number of edges I need to remove to disconnect the graph is at least $k$. There is nothing to prove here, it is self evident. Nor is this the statement of Menger's theorem.
+  Firstly, if an undirected graph remains connected after removing any set of fewer than $k$ edges, then the minimum number of edges that need to be removed to disconnect the graph is at least $k$. There is nothing to prove here, it is self evident. Nor is this the statement of Menger's theorem.
 
   (One version of) Menger's theorem states: *If an undirected graph remains connected after removing any set of fewer than $k$ edges, then there exist at least $k$ disjoint paths between any pair of vertices.*
   - Two paths are disjoint if they do not share any edge.
 
-  Let $G$ be an undirected graph, such that on removal of any set of fewer than $k$ edges, $G$ remains connected. Consider any two arbitrary vertices of $G$, call them $s$ and $t$. Construct a network flow $G'$ by making all edges directed (antiparallel edges), and all edge capacities $1$, taking $s$ as the source and $t$ as the sink. Consider the size (number of edges) of the minimum $s-t$ cut in $G'$. It cannot be less than $k$, since if there is a cut with less than $k$ edges, by removing these edges from $G$ we can disconnect it, which is a contradiction. So, the size of the minimum $s-t$ cut in $G'$ must be $>= k$.
+  Let $G$ be an undirected graph, such that on removal of any set of fewer than $k$ edges, $G$ remains connected. Consider any two arbitrary vertices of $G$, call them $s$ and $t$. Construct a flow network $G'$ by making all edges directed (along both directions), and all edge capacities $1$, taking $s$ as the source and $t$ as the sink. Consider the size (number of edges) of the minimum $s-t$ cut in $G'$. It cannot be less than $k$, since if there is a cut with less than $k$ edges, by removing these edges from $G$ we can disconnect it, which is a contradiction. So, the size of the minimum $s-t$ cut in $G'$ must be $>= k$.
 
-  By the max-flow min-cut theorem, the value of the max flow in $G'$ should be at least $k$. Consider an integral max flow $f$ in $G'$. We can decompose $f$ into exactly $|f|$ path flows from $s$ to $t$, each with value $1$ (since no path flow can have a value more than 1). Also, no two of these path flows may share any edge, i.e. they must be disjoint. This is guaranteed by the fact that each edge has a capacity of $1$, so at no point other than $s$ or $t$, can flow combine / separate. Thus, this gives us at least $k$ disjoint paths in $G$ between $s$ and $t$.
+  By the max-flow min-cut theorem, the value of the max flow in $G'$ should be at least $k$. Consider an integral max flow $f$ in $G'$. WLOG, assume $f$ is acyclic. We can decompose $f$ into exactly $|f|$ path flows from $s$ to $t$, each with value $1$ (since no path flow can have a value more than 1). Also, no two of these path flows may share any edge, i.e. they must be disjoint. This is guaranteed by the fact that each edge has a capacity of $1$, so one edge cannot be part of two path flows of value $1$. Thus, this gives us at least $k$ disjoint paths in $G$ between $s$ and $t$.
 
   Since $s$ and $t$ were chosen arbitrarily, this means we can get at least $k$ disjoint paths between any pair of vertices in $G$.
 ]
@@ -428,11 +426,13 @@ We have looked at some applications of the max-flow problem, how other problems 
 #soln-box[
   First we abstract out the input information: We just need to know, for each of the $n$ people, what are the hospitals that they can visit. Compute this information beforehand. We need to find out if there exists a pairing of each person with one hospital (that they can visit), such that the total number of people visiting a hospital is at most $ceil(n/k)$.
 
-  Construct a bipartite graph $G = (V = (A union.plus B), E)$, with $A = {a_1, ..., a_n}$ representing $n$ people, and $B = {b_1, ..., b_k}$ representing $k$ hospitals. Add an edge between $(a_i, b_j)$ if person $a_i$ can reach hospital $b_j$ in time.
+  Construct a bipartite graph $G = (V = (A union.plus B), E)$, with $A = {a_1, ..., a_n}$ representing $n$ people, and $B = {b_1, ..., b_k}$ representing $k$ hospitals. Add an edge between $(a_i, b_j)$ if person $i$ can reach hospital $j$ in time.
 
   Construct a flow network $G'$ by adding a source $s$, a sink $t$, and edges from $(s, a_i)$ with capacity 1, and $(b_j, t)$ with capacity $ceil(n / k)$. Direct all existing edges $(a_i, b_j)$ to be from $A$ to $B$, with capacity $oo$. Find the value of the max-flow on $G'$ (by using any suitable polynomial time algorithm). If the value of the max-flow is $n$, then the answer is YES, otherwise NO.
 
   Proof: If a integral max-flow of value $n$ exists, then this means for each $a_i$ an outgoing edge has flow $= 1$, which means each person is matched with one hospital (among the ones it can visit). Also, since outgoing capacity of each hospital is $ceil(n/k)$, this means that each hospital needs to cater to at most $ceil(n/k)$ people.
+
+  *Alternatively:* Let $p = ceil(n / k)$. Construct a bipartite graph $G = (V = (A union.plus B), E)$ with $A = {a_1, ..., a_n}$ representing $n$ people, and $B = {b_(1, 1), b_(1, 2), ..., b_(1, p), b_(2, 1), b_(2, 2), ..., b_(2, p), b_(k, 1), b_(k, 2), ..., b_(k, p)}$, i.e. $p$ nodes for each of the $k$ hospitals. An edge exists between $(a_i, b_(j, l))$ if person $i$ can reach hospital $j$ in time (for all $l$). If a matching of size $n$ exists in $G$, then the answer is YES, otherwise NO.
 ]
 
 3. #[[KT book] Your friends have written a very fast piece of maximum-flow code based on repeatedly finding augmenting paths. However, after you’ve looked at a bit of output from it, you realize that it’s not always finding a flow of _maximum_ value. The bug turns out to be pretty easy to find; your friends hadn’t really gotten into the whole backward-edge thing when writing the code, and so their implementation builds a variant of the residual graph that _only includes the forward edges_. In other words, it searches for $s-t$ paths in a graph $G_f$ consisting only of edges $e$ for which $f(e) < c(e)$, and it terminates when there is no augmenting path consisting entirely of such edges. We’ll call this the Forward-Edge-Only Algorithm. (Note that we do not try to prescribe how this algorithm chooses its forward-edge paths; it may choose them in any fashion it wants, provided that it terminates only when there are no forward-edge paths.)
@@ -443,7 +443,8 @@ It’s hard to convince your friends they need to reimplement the code. In addit
 
 Decide whether you think this statement is true or false, and give a proof of either the statement or its negation.]
 
-#soln-box[
+#disc-box[
+  *Discussion:*
   Essentially, the Forward-Edge-Only algorithm finds a blocking flow $f$ on the graph $G$. (Recall, that a blocking flow is one where every $s$ to $t$ path in $G$ has at least one edge saturated. The Forward-Edge-Only algorithm continuously chooses some $s-t$ path and saturates its critical edge, until no $s-t$ path (with all non-saturated edges) exists. We do not add backward edges, so we are only concerned with $s-t$ paths that exist in $G$ itself.)
 
   Intuitively, it feels that the answer should be no, i.e. we should be able to construct some network by which we can make the ratio of the flow values to be as small as possible, i.e. some blocking flow exists whose value is very small as compared to the optimal max flow's value.
@@ -544,8 +545,16 @@ Decide whether you think this statement is true or false, and give a proof of ei
   So our approach doesn't work: On this graph, just by changing the edge capacities of the network, the Forward-Edges-Only algorithm will always output a flow whose value is at least $1/2 |f^*|$ or better.
 
   But this gives another idea. Of course we can make our graph however we want. Maybe repeating a structure like this arbitrarily can decrease the lower bound of the ratio arbitrarily. So the high level idea is: For some given $k$, construct a network $G$, which has one blocking flow with (ideally) constant flow value, and its max flow value is linear in $k$. This suffices to prove what we need.
+]
 
-  Here's one such construction: Let $k in ZZ_(>0)$. Define a network $G_k = (V_k, E_k)$ as follows:
+#soln-box[
+  *Solution:*
+
+  The statement is false.
+
+  Suppose for contradiction, there does exist some $b > 1$, such that for any flow network $G$, the Forward-Edges-Only algorithm is guaranteed to find a flow of value at least $1/b$ times the max-flow value.
+
+  Let $k in ZZ_(>0)$. Define a network $G_k = (V_k, E_k)$ as follows:
   - $V_k = {s, t} union {a_1, ..., a_k} union {b_1, ..., b_k}$
   - $E_k = {(s, a_1), (b_1, a_2), (b_2, a_3), ..., (b_(k- 1), a_k), (b_k, t)} union {(a_1, b_1), (a_2, b_2), ..., (a_k, b_k)} union {(s, b_i) | 1 <= i <= k} union {(a_i, t) | 1 <= i <= k}$, all edges have capacity $1$.
 
@@ -632,14 +641,6 @@ Decide whether you think this statement is true or false, and give a proof of ei
   Suppose the Forward-Edges-Only algorithm pickes the path: $s -> a_1 -> b_1 -> ... -> a_k -> b_k -> t$. Then, since all edges in this path have capacity $1$, all of them get saturated, so all these edges get removed from the residual graph. As no backward edges are added, no other $s-t$ path exists and the algorithm terminates here, with a flow $f$ having value of $|f| = 1$.
 
   We can clearly show that the value of the max flow is $k + 1$: By saturating these paths: $s -> a_1 -> t$, $s -> b_1 -> a_2 -> t$, ..., $s -> b_k -> t$, we can get a flow $f^*$ with value $|f^*| = k + 1$. This is a max flow because the capacity of the $(s, V - s)$ cut is also $k + 1$.
-
-  So, we have achieved our goal. Now, just for formalities:
-
-  *Solution:*
-
-  The statement is false.
-
-  Suppose for contradiction, there does exist some $b > 1$, such that for any flow network $G$, the Forward-Edges-Only algorithm is guaranteed to find a flow of value at least $1/b$ times the max-flow value.
 
   Let $k = ceil(b)$. Construct $G_k$ as shown. Suppose the forward edges algorithm chooses the path $s -> a_1 -> b_1 -> ... -> a_k -> b_k -> t$. Then, once it augments by this path, there are no other $s-t$ path which only use forward residual edges, so the algorithm terminates with this flow $f$ having value $1$.
 
@@ -732,9 +733,13 @@ Decide whether you think this statement is true or false, and give a proof of ei
   Give an algorithm that accomplishes this task using only $O(k log n)$ pings.
 ]
 
+#disc-box[
+  What does $k log n$ operations suggest? Also look at problem 1...
+
+]
+
 #soln-box[
 
-  What does $k log n$ operations suggest? Also look at problem 1...
 
   *Solution*
 
@@ -767,15 +772,8 @@ We say that $M$ is _rearrangeable_ if it is possible to swap some of the pairs o
   + Give a polynomial-time algorithm that determines whether a matrix $M$ with $0-1$ entries is rearrangeable.]
 
 #set math.mat(delim: "[")
-#soln-box[
-
-  (a) Initially, it might seem that it is not possible to construct such a matrix (actually, I came up with this counter example only after solving (b)), but just jotting down something on paper and trying things out will lead to a counter example, such as this:
-
-  $
-    M = mat(1, 0, 0, 0; 1, 0, 0, 0; 1, 0, 0, 0; 1, 1, 1, 1)
-  $
-
-  (b) First observation: The swapping operation is reversible. So if some matrix $M$ is rearrangeable, that means that from a matrix with all ones in the diagonal entries, we can perform some swaps and reach $M$.
+#disc-box[
+  First observation: The swapping operation is reversible. So if some matrix $M$ is rearrangeable, that means that from a matrix with all ones in the diagonal entries, we can perform some swaps and reach $M$.
 
   $
     mat(1, X, X, X; X, 1, X, X; X, X, 1, X; X, X, X, 1) -->^"some swaps" M
@@ -787,16 +785,28 @@ We say that $M$ is _rearrangeable_ if it is possible to swap some of the pairs o
     M = mat(X, 1, X, X; 1, X, X, X; X, X, X, 1; X, X, 1, X)
   $
 
-  Then, we have a characterisation: If there exists permutations $i_1, ..., i_n$ and $j_1, ..., j_n$, such that $m_(i_k, j_k) = 1$ for all $k$, then $M$ is rearrangeable.
+  Then, we have a characterisation: If $M$ is rearrangeable, there exists permutations $i_1, ..., i_n$ and $j_1, ..., j_n$, such that $m_(i_k, j_k) = 1$ for all $k$.
 
-  Does that sound familiar?
+  Sounds familiar?
+]
 
-  *Solution:*
+#soln-box[
+
+  (a) $M$ has at least one $1$ in each row and each column, but is not rearrangeable.
+
+  $
+    M = mat(1, 0, 0, 0; 1, 0, 0, 0; 1, 0, 0, 0; 1, 1, 1, 1)
+  $
+
+  (b)
+
 
   Construct a bipartite graph $G = (A union.plus B, E)$, $A = {a_1, a_2, ..., a_n}$, $B = {b_1, b_2, ..., b_n}$, $E = {(a_i, b_j) | m_(i j) = 1}$. (Add edges between $a_i$ and $b_j$ if $m_(i j) = 1$.) If $G$ has a perfect matching, then $M$ is rearrangeable, otherwise it is not.
 
-  Proof: Suppose $G$ has a perfect matching. Then, let that matching have edges $(a_1, b_pi_1), (a_2, b_pi_2), ..., (a_n, b_pi_n)$. This means, for all $i = 1, 2, ..., n$, we have $m_(i, pi_i) = 1$, i.e. in the $i$th row, the $pi_i$th entry is a $1$. (All $pi_i$s are distinct.) Now, we need to rearrange it to get all these ones in the diagonal cells. So, there exists some sequence of swaps (on columns) so that on row $i$, the 1 at $pi_i$ comes to $i$. For each $i$ from $1, 2, ..., n$, one may simply greedily keep swapping column $i$ with the column to the right, where the specific 1 exists in that row (which started at $(i, pi_i)$). Finally we reach a matrix with all diagonal elements as 1.
+  *Proof:*
 
-  Suppose $M$ is rearrangeable. Then (as discussed above), there exists a sequence of swaps starting from some matrix with all diagonal elements 1, which finally reach $M$. Then, there exists permutations $i_1, ..., i_n$ and $j_1, ..., j_n$ such that $m_(i_k, j_k) = 1$ for all $k = 1, 2, ..., n$. Then, in $G$, consider $M = {(a_i_k, b_i_k) | k = 1, 2, ..., n}$. This is a perfect matching.
+  Suppose $G$ has a perfect matching. Then, let that matching have edges $(a_1, b_pi_1), (a_2, b_pi_2), ..., (a_n, b_pi_n)$. This means, for all $i = 1, 2, ..., n$, we have $m_(i, pi_i) = 1$, i.e. in the $i$th row, the $pi_i$th entry is a $1$. (All $pi_i$s are distinct.) Now, we need to rearrange it to get all these ones in the diagonal cells. We can perform a sequence of column swaps to reorder the columns according to the inverse of the permutation $pi$. We swap columns until the original column $pi_i$ is moved to the $i$th position. (Any permutation can be decomposed into a sequence of swaps). After these swaps, an entry that was located at $(i, pi_i)$ is now located at $(i, i)$. Thus, all diagonal elements of $M'$ are $1$, hence $M$ is rearrangeable.
+
+  Suppose $M$ is rearrangeable. This means there exist a sequence of row and column swaps, which result in a new matrix $M'$, such that all its diagonal elements are $1$. Then, there exists permutations $i_1, ..., i_n$ and $j_1, ..., j_n$ such that $m_(i_k, j_k) = 1$ for all $k = 1, 2, ..., n$. By construction of $G$, $(i_k, j_k) in E$. Then, in $G$, consider $W = {(a_i_k, b_i_k) | k = 1, 2, ..., n}$. No two edges in this set share any vertices since $i_k$ and $j_k$ are permutations. Thus, $W$ is a perfect matching in $G$.
 
 ]

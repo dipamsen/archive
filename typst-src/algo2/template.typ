@@ -78,6 +78,19 @@
   )
 }
 
+#let disc-box(body) = {
+  block(
+    width: 100%,
+    fill: green.lighten(90%),
+    inset: (x: 1em, y: 0.8em),
+    stroke: (left: 1pt + green),
+    {
+      set text(0.9em)
+      body
+    }
+  )
+}
+
 #let hl-box(body) = {
   block(
     width: 100%,
