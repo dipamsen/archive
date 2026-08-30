@@ -25,6 +25,11 @@
       "title": "Applications of Maximum Flow",
       "source": "applications-of-maxflow.typ",
       "slug": "applications-of-maximum-flow"
+    },
+    {
+      "title": "Edmonds' Blossom",
+      "source": "edmonds-blossom.typ",
+      "slug": "edmonds-blossom"
     }
   ]
 }

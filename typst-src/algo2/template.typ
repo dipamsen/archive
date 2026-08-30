@@ -160,3 +160,9 @@
 #let example-box(body, title: "Example") = theorem-box(
   title: title, color: rgb("#4C6444"), numbered: false, body
 )
+
+
+#let number(body) = {
+  set math.equation(numbering: "(1)")
+  body
+}

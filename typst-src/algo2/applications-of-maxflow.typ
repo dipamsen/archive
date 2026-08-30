@@ -747,13 +747,13 @@ Decide whether you think this statement is true or false, and give a proof of ei
 
   By Menger's theorem (Problem 1), the value of the max-flow of $G$ is $k$. Thus, there exist at least $k$ edge-disjoint paths from $s$ to $t$ in $G$. Since $k$ edges are removed in total, and at least one edge must be removed from each of these paths (otherwise there will still remain a $s-t$ path in the graph). Therefore, from each of these paths exactly one edge must have been removed.
 
-  Consider one such path $p = chevron.l s, v_1, v_2, ..., v_m, t chevron.r$. Suppose that the edge $(v_i, v_(i + 1))$ was removed from this path. Then, what will be the outcome of $"ping"(v)$ for each vertex in path $p$? Clearly, for $v_1, v_2, ..., v_i$, ping will report a path from $s$ to $v$ exists, whereas, for $v_(i + 1), ..., v_m$, ping reports that no path exists (why?). This is a monotonic function, which means we can binary search over these vertices! Say we want to know the highest index vertex $v_i$, such that $v_i$ is reachable from $s$. Then, perform a standard binary search on the range ${1, ..., l}$:
+  Consider one such path $p = chevron.l s = v_1, v_2, ..., v_m = t chevron.r$. Suppose that the edge $(v_i, v_(i + 1))$ was removed from this path. Then, what will be the outcome of $"ping"(v)$ for each vertex in path $p$? Clearly, for $v_1, v_2, ..., v_i$, ping will report a path from $s$ to $v$ exists, whereas, for $v_(i + 1), ..., v_m$, ping reports that no path exists (why?). This is a monotonic function, which means we can binary search over these vertices! Say we want to know the highest index vertex $v_i$, such that $v_i$ is reachable from $s$. Then, perform a standard binary search on the range ${1, ..., l}$:
 
   - $l = 0, r = m$
   - #While $l < r$, let mid = $floor((l + r + 1) \/ 2)$
     - ping($v_"mid"$).
-    - #If reachable, then $l = "mid"$
-    - #Else, $r = "mid" - 1$
+    - #If reachable, then $l <- "mid"$
+    - #Else, $r <- "mid" - 1$
 
   Finally, $l$ has the value of $i$ such that $v_i$ is the highest indexed vertex reachable from $s$. This takes $O(log m) = O(log n)$ ping operations to find out. Once we know this, we know that $(v_i, v_(i + 1))$ was the edge that was removed.
 
