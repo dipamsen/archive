@@ -358,7 +358,7 @@ With $a$ having gotten rid of all its excess flow, $b$ (still at height $0$, hol
 )
 
 #let node = node.with(radius: 3.5mm)
-#let draw-push-relabel-stage(vertices, edges) = diagram(
+#let draw-push-relabel-stage(vertices, edges, ..oth) = diagram(
   node-shape: circle, node-stroke: 1pt, mark-scale: 1.5, node-fill: white,
   {
     for (i, v) in vertices.enumerate() {
@@ -373,7 +373,7 @@ With $a$ having gotten rid of all its excess flow, $b$ (still at height $0$, hol
 
       edge(u, "-|>", v, { set text(0.8em); e.at(2)}, label-sep: 0pt, bend: if e.at(3, default: none) != none { e.at(3) } else if calc.abs(ui - vi) > 1 and vertices.at(ui).height == vertices.at(vi).height { -50deg } else { 0deg }, stroke: if will-push { (paint: yellow.darken(20%), thickness: 1.5pt) } else { auto }, mark-scale: if will-push { 0.35 } else { 1 })
     }
-}, spacing: 0cm, cell-size: (1.5cm, 0.7cm), render: (grid, nodes, edges, options) => {
+}, spacing: 0cm, cell-size: (1.5cm, 0.7cm), ..oth, render: (grid, nodes, edges, options) => {
   let n = vertices.len();
   let max-h = calc.max(..vertices.map(x => x.height))
   cetz.canvas({
@@ -440,11 +440,7 @@ As compared to Dinic's algorithm (which was an augmenting path algorithm) which 
 
 = Problems
 
-there are none :)
-
-but the text talks about a problem 1 so here it is anyways
-
-1. Design/use a suitable data structure so that the push relabel algorithm takes $O(n^3)$ time.
+1. Design/use a suitable data structure so that the push relabel algorithm takes $O(n^3)$ time. Implement the push relabel algorithm using your data structure and compare its performance against Edmond-Karp’s algorithm and Dinic’s algorithm.
 
 #soln-box[
   Call a vertex having positive excess flow 'active'.
@@ -466,6 +462,72 @@ but the text talks about a problem 1 so here it is anyways
   In total, on each iteration, there are $O(1)$ insertions and deletions, all of which will run in constant time. The only other thing is decrementing of `max_h` when we delete a vertex from `max_h`, and its list becomes empty. Observe that `max_h` can only increase during a #relabel operation (and that too by at most $1$). Since the total number of relabel operations are $O(n^2)$, the total number of increments to `max_h` is at most $O(n^2)$. So, there can be at most $O(n^2)$ decrements to `max_h` throughout the algorithm. Since there are $O(n^3)$ iterations in total, the cost for decrementing amortizes to $O(1)$ per iteration.
 
   Thus, the total running time of the algorithm is $O(n^3)$.
+]
 
+2. [CLRS] Suppose that all edge capacities in the flow network $G$ are in the set ${1, 2, ... , k}$. Analyse the running time of the push relabel algorithm in terms of the number of vertices $n$, the number of edges $m$ in $G$ as well as $k$.
 
+#soln-box[
+  - The total number of relabel operations is $O(n^2)$ (Corollary of Lemma 5).
+  - The total number of saturating push operations is $O(m n)$ (Corollary of Lemma 6).
+
+  For the number of non saturating push operations, we can get a better bound here, since each edge capacity is at most $k$.
+  - Once an edge $(u, v)$ is saturated, no more flow can be pushed through it, until flow is pushed backward through $(v, u)$, for which $v$ will have to be higher than $u$. Since the height of a vertex can be $2 |V|$, an edge can be saturated at most $2 |V|$ times.
+  - Between two saturations of the edge $(u, v)$, it can undergo at most $k$ non saturating pushes.
+
+  Thus, summing over all edges, the total number of non-saturating pushes is bounded by $O(2 k |V| |E|)$. Since this dominates the complexities of the other operations, the running time of the algorithm is $O(2 k |V| |E|)$.
+]
+
+3. Given a flow network $G$ and a flow $f$ show that the underlying undirected graph of $G$ is connected if and only if the underlying undirected graph of $G_f$ is connected.
+
+#soln-box[
+  If the underlying undirected graph of $G$ is connected, then it is necessary that the underlying undirected graph of $G_f$ is too, since for every node $(u, v) in E$, at least one of $(u, v)$ or $(v, u)$ exists in $E_f$. Thus, if there is a path from $v_1$ to $v_2$ in the underlying undirected graph of $G$, then that same path also exists in the underlying  undirected graph of $G_f$.
+
+  Suppose the underlying undirected graph of $G_f$ is connected. Then for any $u, v in V$ there exists a path from $u$ to $v$ in the underlying undirected graph of $G_f$. Each edge in this path is of the form $(u, v)$ where either $(u, v)$ or $(v, u)$ belongs to $E_f$. Since the residual edges are either forward or backward edges of the original graph $G$, either $(u, v)$ or $(v, u)$ exists in $E$. Therefore the path from $u$ to $v$ exists in the underlying undirected graph of $G$.
+]
+
+4. Consider a run of push-relabel algorithm. For a residual graph $G_f$, let $delta_f (u, v)$ be the number of edges in the shortest path from $u$ to $v$.
+  - Show that for any vertex $u$, $delta_f (u, t) >= h(u)$ where $h$ denotes the current height function.
+  - Is it possible that $h(s) >= h(u) > delta_f (u, s)$? Construct examples.
+
+#soln-box[
+- #[Show by induction on the number of operations.\
+  *Base:* Initially $delta_f (s, t) = oo$, $h(s) = n$; for other vertices $h(v) = 0$, $delta_f (v, t) >= 0$.\
+  *Step:*
+    - #push: Suppose a push happens along the edge $(v, w)$, so $h(v) = 1 + h(w)$. After the push, the changes in the set $E_f$ are, a potential removal of the edge $(v, w)$, and a potential addition of the edge $(w, v)$.
+      - Removing an edge can never decrease the length of the shortest path between any two vertices. So, $delta_f (u, t) >= h(u)$ is maintained.
+      - Suppose addition of $(w, v)$ creates a new shorter path from some $x$ to $t$, then $delta_f (x, t) = delta_f (x, w) + 1 + delta_f (v, t)$. We have, $delta_f (v, t) >= h(v)$ (hypothesis). Let $p = chevron.l x = v_0, ..., v_k = w chevron.r$ be the shortest path from $x$ to $w$ in $G_f$, then for each edge $(v_i, v_(i + 1))$ we have $h(v_i) - h(v_(i + 1)) <= 1$. Adding over all edges we get $h(x) - h(w) <= delta_f (x, w)$.
+
+        So we have
+        $
+delta_f (x, t) &= delta_f (x, w) + 1 + delta_f (v, t)\
+&>= h(x) - h(w) + 1 + h(v) \
+&>= h(x) + 2 > h(x)
+        $
+    - #relabel: Suppose vertex $u$ is relabelled, this means there do not exist any downhill edges from $u$. If $(u, v) in E_f$, $h(u) <= h(v)$ (before relabelling)
+      - If $u$ has no path to $t$, $delta_f (u, t) = oo$, so the property holds trivially.
+      - If $u$ has a path to $t$, let the first node on the shortest path be $y$. Then, $delta_f (u, t) = 1 + delta_f (y, t)$. Before relabelling, $h(u) <= h(y)$, so after relabelling $h'(u) <= 1 + h(y)$.
+        $
+          h'(u) <= 1 + h(y) <= 1 + delta_f (y, t) = delta_f (u, t)
+        $
+]
+
+- #[
+  Consider the network $s -->^10 a -->^10 b -->^1 t$.
+
+  A partial simulation of the algorithm is shown below. At some intermediate stage, we have $h(s) = 4$, $h(a) = 3$, $delta_f (a, s) = 1$, thus $h(s) >= h(a) > delta_f (a, s)$.
+
+  #let example-typ = read("push-relabel-example-2.typ")
+
+  #let stages = eval(example-typ, mode: "code", scope: (draw-push-relabel-stage: draw-push-relabel-stage.with(cell-size: (1.2cm, 0.6cm)), vertex: vertex)).slice(0, 8)
+
+  #figure({
+    set text(0.9em)
+    grid(
+      columns: (1fr, 1fr),
+      row-gutter: 0.65em,
+      align: center,
+      ..stages
+    )
+  })
+]
 ]
