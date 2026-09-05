@@ -6,14 +6,14 @@
 
 #show: project.with(
   subject: "Algorithms II",
-  topic: "Edmonds' Blossom"
+  topic: "Maximum Matching in General Graphs"
 )
 
 #let op(x) = smallcaps[#x]
 #let phi = sym.phi.alt
 #let symdiff = math.class("binary", sym.Delta)
 
-#title[Edmonds' Blossom]
+#title[Maximum Matching in General Graphs]
 
 We have already discussed the Maximum Matching problem for bipartite graphs, by reducing it to the Maximum Flow problem. Here, we discuss the maximum matching problem on general graphs. In particular, we will discuss the *Edmonds' Blossom Algorithm* which finds the maximum matching in a general graph in polynomial time.
 

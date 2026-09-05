@@ -27,9 +27,14 @@
       "slug": "applications-of-maximum-flow"
     },
     {
-      "title": "Edmonds' Blossom",
+      "title": "General Max-Matching",
       "source": "edmonds-blossom.typ",
       "slug": "edmonds-blossom"
+    },
+    {
+      "title": "Stable Matching",
+      "source": "stable-matching.typ",
+      "slug": "stable-matching"
     }
   ]
 }
