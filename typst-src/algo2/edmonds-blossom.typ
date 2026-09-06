@@ -666,8 +666,8 @@ For completeness (and analysis), here is an informal pseudocode for the complete
 - Outer loop in #op("Edmonds-Blossom"): On each iteration, we improve the size of the matching by at least one. Since the size of the maximum matching is at most $V / 2$, so this loop runs at most $V / 2$ times.
 - Inner BFS (#op("Find-Augmenting-Path")):
   - Other than blossoms, exploring the graph takes $O(E)$ time.
-  - Each blossom contraction (line 24) reduces the total number of vertices in the graph by at least 2. So, there can be at most $O(V)$ contractions. Each contraction involves updating the graph, which can take $O(E)$ time. So in total, contracting vertices take $O(V E)$ time.
-  - Path lifting (line 13) takes $O(V)$ time (expanding the pseudo vertices and routing the path through odd cycles). This happens at most once in one call of #op("Find-Augmenting-Path")
+  - Each blossom contraction (line 25) reduces the total number of vertices in the graph by at least 2. So, there can be at most $O(V)$ contractions. Each contraction involves updating the graph, which can take $O(E)$ time. So in total, contracting vertices take $O(V E)$ time.
+  - Path lifting (line 14) takes $O(V)$ time (expanding the pseudo vertices and routing the path through odd cycles). This happens at most once in one call of #op("Find-Augmenting-Path")
   - Every other operation unaccounted for in this function runs in constant time.
 
 Therefore, in total the time complexity is bounded by $O(V) times O(V E) = O(V^2 E)$, which is polynomial time.
