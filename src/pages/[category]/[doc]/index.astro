@@ -10,7 +10,7 @@ export async function getStaticPaths() {
     .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id))
     .flatMap((cat) =>
       cat.data.docs.map((doc) => ({
-        params: { category: cat.id, doc: doc.slug ?? doc.source.replace(/\.typ$/, "") },
+        params: { category: cat.id, doc: doc.slug },
         props: { categories, category: cat, doc },
       })),
     );
@@ -23,8 +23,10 @@ interface Props {
 }
 const { categories, category, doc } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const slug = doc.slug ?? doc.source.replace(/\.typ$/, "");
-const pdfPath = `${base}/pdfs/${category.id}/${slug}.pdf`;
+const slug = doc.slug;
+const pdfPath = doc.pdf
+  ? `${base}/pdfs/${category.id}/${doc.pdf}`
+  : `${base}/pdfs/${category.id}/${slug}.pdf`;
 ---
 
 <Layout title={doc.title}>

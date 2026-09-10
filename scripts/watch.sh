@@ -28,8 +28,10 @@ parse_docs() {
 import json, sys
 data = json.load(open(sys.argv[1]))
 for doc in data["docs"]:
-    source = doc["source"]
-    slug = doc.get("slug") or source.rsplit(".", 1)[0]
+    source = doc.get("source")
+    if not source:
+        continue
+    slug = doc["slug"]
     print(f"{source}\t{slug}\t{doc['title']}")
 PY
 }

@@ -1,0 +1,50 @@
+{
+    "title": "Switching Circuits Laboratory",
+    "docs": [
+        {
+            "title": "Building CMOS Gates and simple circuits",
+            "pdf": "SCL_A01_G36.pdf",
+            "slug": "scl-a01"
+        },
+        {
+            "title": "Realising gate-level circuits from truth tables",
+            "pdf": "SCL_A02_G36.pdf",
+            "slug": "scl-a02"
+        },
+        {
+            "title": "Designing combinational circuits with clock and counter",
+            "pdf": "SCL_A03_G36.pdf",
+            "slug": "scl-a03"
+        },
+        {
+            "title": "Designing combinational using functional blocks",
+            "pdf": "SCL_A04_G36.pdf",
+            "slug": "scl-a04"
+        },
+        {
+            "title": "Design of a 4-bit adder/subtractor",
+            "pdf": "SCL_A05_G36.pdf",
+            "slug": "scl-a05"
+        },
+        {
+            "title": "Design of flip flops",
+            "pdf": "SCL_A06_G36.pdf",
+            "slug": "scl-a06"
+        },
+        {
+            "title": "Design of shift registers",
+            "pdf": "SCL_A07_G36.pdf",
+            "slug": "scl-a07"
+        },
+        {
+            "title": "Design of counters",
+            "pdf": "SCL_A08_G36.pdf",
+            "slug": "scl-a08"
+        },
+        {
+            "title": "Design of complete systems",
+            "pdf": "SCL_A09_G36.pdf",
+            "slug": "scl-a09"
+        }
+    ]
+}

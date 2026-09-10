@@ -30,15 +30,17 @@ if [ ! -d "$CATS_DIR" ]; then
   exit 1
 fi
 
-# Parses one category JSON file and prints one line per doc:
+# Parses one category JSON file and prints one line per Typst-backed doc:
 #   source<TAB>slug<TAB>title
 parse_docs() {
   python3 - "$1" <<'PY'
 import json, sys
 data = json.load(open(sys.argv[1]))
 for doc in data["docs"]:
-    source = doc["source"]
-    slug = doc.get("slug") or source.rsplit(".", 1)[0]
+    source = doc.get("source")
+    if not source:
+        continue
+    slug = doc["slug"]
     print(f"{source}\t{slug}\t{doc['title']}")
 PY
 }
@@ -66,9 +68,6 @@ for cat_file in "$CATS_DIR"/*.json; do
     compiled=$((compiled + 1))
   done < <(parse_docs "$cat_file")
 
-  # Informational only: point out .typ files in this category's folder that
-  # no doc entry references (expected for template/library files, but also
-  # catches "I wrote a new doc and forgot to add it to the JSON").
   if [ -d "$SRC_DIR/$category" ]; then
     while IFS= read -r -d '' typ; do
       name="$(basename "$typ")"

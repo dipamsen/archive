@@ -8,14 +8,11 @@ interface Props {
 const { categories, current } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-function docSlug(doc: { source: string; slug?: string }) {
-  return doc.slug ?? doc.source.replace(/\.typ$/, "");
-}
 
 const totalDocs = categories.reduce((sum, c) => sum + c.data.docs.length, 0);
 ---
 
-<aside class="sidebar">
+<aside class="sidebar" style="visibility:hidden">
   <nav class="groups">
     {
       categories.map((cat) => (
@@ -27,7 +24,7 @@ const totalDocs = categories.reduce((sum, c) => sum + c.data.docs.length, 0);
           <ul>
             {[...cat.data.docs]
               .map((doc) => {
-                const slug = docSlug(doc);
+                const slug = doc.slug;
                 const active = current?.category === cat.id && current?.doc === slug;
                 return (
                   <li>
@@ -42,6 +39,34 @@ const totalDocs = categories.reduce((sum, c) => sum + c.data.docs.length, 0);
       ))
     }
   </nav>
+  <script>
+    (function () {
+      try {
+        const aside = document.querySelector('.sidebar');
+        if (!aside) return;
+
+        const ensureActiveVisible = () => {
+          const active = aside.querySelector('.entry.active');
+          if (active) {
+            active.scrollIntoView({ block: 'center', inline: 'nearest' });
+          }
+          // @ts-ignore
+          aside.style.visibility = '';
+        };
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          requestAnimationFrame(ensureActiveVisible);
+        } else {
+          document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(ensureActiveVisible), { once: true });
+        }
+      } catch (err) {
+        console.error('Sidebar auto-scroll error', err);
+        // @ts-ignore
+        if (document.querySelector('.sidebar')) document.querySelector('.sidebar').style.visibility = '';
+      }
+    })();
+  </script>
+  <noscript><style>.sidebar{visibility:visible}</style></noscript>
 </aside>
 
 <style>
