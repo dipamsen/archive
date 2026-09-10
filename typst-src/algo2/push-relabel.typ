@@ -490,7 +490,7 @@ As compared to Dinic's algorithm (which was an augmenting path algorithm) which 
   - Is it possible that $h(s) >= h(u) > delta_f (u, s)$? Construct examples.
 
 #soln-box[
-- #[Show by induction on the number of operations.\
+- #[We can show this by induction on the number of operations.\
   *Base:* Initially $delta_f (s, t) = oo$, $h(s) = n$; for other vertices $h(v) = 0$, $delta_f (v, t) >= 0$.\
   *Step:*
     - #push: Suppose a push happens along the edge $(v, w)$, so $h(v) = 1 + h(w)$. After the push, the changes in the set $E_f$ are, a potential removal of the edge $(v, w)$, and a potential addition of the edge $(w, v)$.
@@ -509,8 +509,19 @@ delta_f (x, t) &= delta_f (x, w) + 1 + delta_f (v, t)\
         $
           h'(u) <= 1 + h(y) <= 1 + delta_f (y, t) = delta_f (u, t)
         $
-]
 
+
+  *Alternative Solution:* (Credits: AS) There is a simpler solution:
+
+  If there is no path from $u$ to $t$ (in $G_f$), then $delta_f (u, t) = oo$ and the inequality trivially holds. Suppose there is a path from $u$ to $t$. Let the shortest path from $u$ to $t$ be $p = chevron.l u = v_0, v_1, ..., v_k = t chevron.r$. Here, $k = delta_f (u, t)$.
+
+  For each edge $(v_i, v_(i + 1))$, we have $h(v_i) - h(v_(i + 1)) <= 1$. Adding this over all $k$ edges, we get:
+  $
+    h(v_0) - h(v_k) <= k quad => h(u) - h(t) <= k\
+    => k >= h(u) quad => delta_f (u, t) >= h(u)
+  $
+]
+#colbreak()
 - #[
   Consider the network $s -->^10 a -->^10 b -->^1 t$.
 
