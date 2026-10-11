@@ -35,6 +35,11 @@
       "title": "Stable Matching",
       "source": "stable-matching.typ",
       "slug": "stable-matching"
+    },
+    {
+      "title": "Order Statistics, Sorting Lower Bound",
+      "source": "order-statistics.typ",
+      "slug": "order-statistics-sorting"
     }
   ]
 }

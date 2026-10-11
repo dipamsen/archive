@@ -28,6 +28,7 @@
 
   show heading: set text(primary-color)
   show title: set text(primary-color)
+  show link: set text(green.darken(50%))
 
 
   show figure: it => {
