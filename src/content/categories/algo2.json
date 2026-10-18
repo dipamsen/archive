@@ -40,6 +40,16 @@
       "title": "Order Statistics, Sorting Lower Bound",
       "source": "order-statistics.typ",
       "slug": "order-statistics-sorting"
+    },
+    {
+      "title": "Karger's Min Cut",
+      "source": "karger-stein.typ",
+      "slug": "karger-stein"
+    },
+    {
+      "title": "Computational Complexity",
+      "source": "computational-complexity.typ",
+      "slug": "computational-complexity"
     }
   ]
 }

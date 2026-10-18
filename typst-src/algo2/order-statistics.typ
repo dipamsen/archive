@@ -216,6 +216,8 @@ Otherwise, if $i < j$ then we know that the element we are searching for is less
 
 }), caption: [The recursive #op("Select") procedure])
 
+(Note that the #op("Select") procedure correctly finds the $i$th order statistic regardless of the chosen pivot. Choosing the pivot element uniformly at random results in the algorithm known as *quickselect*. Here, we wish to make the pivot an approximate median only to improve the worst case running time of the algorithm.)
+
 = Finding the pivot
 
 Now, we need to actually find a pivot $x$ which is an approximate median, i.e. at least a constant fraction of the array is to its left and right. By choosing such an element as a pivot, we ensure that some constant fraction of the array is always discarded on each recursive call, thus achieving our desired time complexity (as we will see).
@@ -332,9 +334,8 @@ $
 Thus, we get the overall recurrence relation:
 
 $
-  T(n) <= T(ceil(n / 5)) + T((7n) / 10 + 6) + O(n)
+  T(n) = cases(c quad quad &"for" n < n_0, T(ceil(n / 5)) + T((7n) / 10 + 6) + O(n) quad quad &"otherwise")
 $
-(for sufficiently large $n$.)
 
 We state a lemma (without proof) which we can directly apply here to get the $O$-bound for $T(n)$.
 
@@ -364,7 +365,7 @@ By applying the above lemma on our recurrence, for an appropriate choice of $n_0
   $ |L_x| >= (k + 1) / 2 dot (n / (2k) - 2) = n / 4 + n / (4k) - (k + 1) >= n / 4, $
   where the last step holds for large $n$ (when $n >= 4k(k + 1)$). The bound for $|R_x|$ is symmetric.
 
-  Therefore, $x$ is an approximate median.
+  Therefore, $x$ is an approximate median (this is a weak bound, we can get a stronger bound as well).
 
   Then, our final recurrence can be written as 
 
@@ -594,10 +595,6 @@ Under this model, any comparison-based sort may be represented as a *decision tr
 
 Then, the execution of the sorting algorithm on some input array $A$ is nothing but a path from the root to a leaf of the decision tree, where at each internal node, the choice of which child to go to is based on the outcome of the corresponding comparison. The final output of the algorithm is the sorted sequence, represented by the leaf node.
 
-#cetz.canvas({
-
-})
-
 #figure(cetz.canvas({
   import cetz.draw: *
   set-style(stroke: 0.7pt)
@@ -680,13 +677,51 @@ As a corollary, this also shows that *heapsort and mergesort are asymptotically 
 
 #pagebreak()
 
-= Problems
+= Problems and Solution Sketches
 
 1. Prove that the randomized quick sort algorithm makes #highlight[expected] $O(n log n)$ comparisons for every input.
 
 #soln-box[
   Let $A = [a_1, a_2, ..., a_n]$ be the array which is to be sorted.
   Let $a^((i))$ denote the $i$th smallest element in $A$, so $a^((1))$ is the min element, whereas $a^((n))$ is the max element.
+
+
+  For any pair $a^((i))$ and $a^((j))$ ($i < j$), what is the probability that they are compared?
+
+  $
+    ..., underbrace(a^((i))\, ...\, a^((j)), "block"), ... 
+  $
+
+  Consider the block of elements from $a^((i))$ to $a^((j))$ (in the sorted array). The first pivot that is chosen from this block decides this probability. Any pivot chosen outside this block doesn't affect this block since partititioning over such a pivot keeps the block together. If the first pivot chosen from this block is one of $a^((i))$ or $a^((j))$, then in that case during partitioning the $(a^((i)), a^((j)))$ comparison will take place. If the first pivot chosen from this block is one of the middle elements, then upon partitioning, both these elements will get split apart and never get compared. Each element in the block is  equally likely to become the first pivot to be chosen from this block.
+
+  Let $X_(i j)$ be a indicator random variable denoting that $a^((i))$ and $a^((j))$ are compared. Then
+  $
+    P(X_(i j) = 1) = 2/(j - i + 1).
+  $
+
+  Then, the total number of comparisons is
+
+  $
+    C = sum_(i < j) X_(i j)
+  $
+  By linearity of expectation,
+  $
+    E[C] = sum_(i < j) E[X_(i j)] = sum_(i < j) 2/(j - i + 1)
+  $
+  Group the pairs by the gap $k = j - i$. For each $k = 1, ..., n - 1$ there are exactly $n - k$ pairs $(i, j)$ with $j - i = k$, so
+$
+    E[C] = sum_(k = 1)^(n - 1) (n - k) dot 2/(k + 1) <= 2n sum_(k = 1)^(n - 1) 1/(k + 1) = 2n sum_(m = 2)^n 1/m = 2n (H_n - 1)
+$
+  Since $H_n <= 1 + ln n$, we get
+$
+    E[C] <= 2n ln n
+$
+  Hence
+$
+    E[C] = O(n log n).
+$
+
+  *Alternative Solution*
 
   Since we are taking the expectation over the random pivot choices, the pivot $x$ to be chosen is equally likely to be any of $a^((1)), a^((2)), ..., a^((n))$. If the pivot chosen is $a^((i))$, then $|L_x| = i - 1$ and $|R_x| = n - i$.
 
@@ -727,6 +762,8 @@ As a corollary, this also shows that *heapsort and mergesort are asymptotically 
   $
     T(n) / (n + 1) = O(log n) => T(n) = O(n log n)
   $
+
+
 ]
 
 2. [CLRS] Design an algorithm to compute the second smallest of $n$ elements with $(n + ceil(log_2 n) - 2)$ comparisons in the worst case.
@@ -794,7 +831,17 @@ As a corollary, this also shows that *heapsort and mergesort are asymptotically 
 5. [CLRS] In the algorithm #op("Select"), the input elements are divided into groups of 5. Will the algorithm work in linear time if they are divided into groups of 7? Argue that #op("Select") does not run in linear time if groups of 3 are used.
 
 #soln-box[
-  DIY (See pg 6)
+  For groups of 7,
+  $
+    T(n) = cases(c quad quad &"for" n < n_0, T(ceil(n/7)) + T((5 n)/7) + O(n) quad quad &"otherwise")
+  $
+  which is $O(n)$.
+
+  For groups of 3,
+  $
+    T(n) = cases(c quad quad &"for" n < n_0, T(ceil(n/3)) + T((2n)/3) + O(n) quad quad &"otherwise")
+  $
+  which is superlinear.
 ]
 
 6. [CLRS] Suppose that you have a “black-box” worst-case linear-time median subroutine. Give a linear-time algorithm that solves the selection problem for an arbitrary order statistic.
@@ -809,7 +856,7 @@ As a corollary, this also shows that *heapsort and mergesort are asymptotically 
 
   Thus, we have the recurrence:
   $
-    T(n) <= T(n / 2) + c n
+    T(n) <= cases(O(1) quad quad &"if" n = 1, T(n / 2) + c n quad quad &"otherwise")
   $
   which clearly solves to $T(n) = O(n)$ (inductively prove $T(n) <= 2 c n$ for all $n$).
 ]

@@ -28,8 +28,14 @@
 
   show heading: set text(primary-color)
   show title: set text(primary-color)
-  show link: set text(green.darken(50%))
+  show link: set text(red.darken(20%))
 
+  show sym.arrow.r.double: text.with(font: "New Computer Modern Math")
+  show sym.arrow.r: text.with(font: "New Computer Modern Math")
+  show sym.arrow.r.l.long: text.with(font: "New Computer Modern Math")
+  show sym.arrow.l.r: text.with(font: "New Computer Modern Math")
+  show sym.arrow.l.r.double: text.with(font: "New Computer Modern Math")
+  show sym.arrow.l.r.double.long: text.with(font: "New Computer Modern Math")
 
   show figure: it => {
     set align(center)

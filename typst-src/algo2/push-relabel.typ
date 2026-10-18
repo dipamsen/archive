@@ -461,6 +461,8 @@ As compared to Dinic's algorithm (which was an augmenting path algorithm) which 
 
   In total, on each iteration, there are $O(1)$ insertions and deletions, all of which will run in constant time. The only other thing is decrementing of `max_h` when we delete a vertex from `max_h`, and its list becomes empty. Observe that `max_h` can only increase during a #relabel operation (and that too by at most $1$). Since the total number of relabel operations are $O(n^2)$, the total number of increments to `max_h` is at most $O(n^2)$. So, there can be at most $O(n^2)$ decrements to `max_h` throughout the algorithm. Since there are $O(n^3)$ iterations in total, the cost for decrementing amortizes to $O(1)$ per iteration.
 
+  (This solution does not address how to find if there is a downhill edge (line 4): DIY)
+
   Thus, the total running time of the algorithm is $O(n^3)$.
 ]
 
