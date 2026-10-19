@@ -378,7 +378,7 @@ So, we have:
   $
 ]
 
-*Proof*: Since $L in npc$, for all $L'' in np$, we have $L'' red L$. We also have $L red L'$. By transitivity (Theorem 3), we have: for all $L'' in np$, $L'' red L$. Since $L$ is NP as well, thus $L in npc$ (by definition).  #h(1fr) $square$
+*Proof*: Since $L in npc$, for all $L'' in np$, we have $L'' red L$. We also have $L red L'$. By transitivity (Theorem 3), we have: for all $L'' in np$, $L'' red L'$. Since $L'$ is NP as well, thus $L' in npc$ (by definition).  #h(1fr) $square$
 
 Thus, given a new problem $L$, the strategy for proving it to be NP-complete (_intractable_) is:
 1. Show that $L$ is NP.
