@@ -865,16 +865,13 @@ $
 7. [CLRS] The $k$-th quantiles of an $n$-element set are the $k - 1$ order statistics that divide the sorted set into $k$ equal-sized sets (to within 1). Give an $O(n log k)$-time algorithm to list the $k$-th quantiles of a set.
 
 #soln-box[
-  Let $i_j = ceil(j n \/ k)$ for $j = 1, dots, k - 1$. The $k$th quantiles are the elements of ranks $i_1 < dots < i_(k-1)$.
-
-  Define the procedure $#op("Quantiles");(A, I)$ which takes an array $A$ and a list $I$ of ranks relative to $A$:
-  + If $I$ is empty, return.
-  + Let $r$ be the middle element of $I$ (the $ceil(|I| \/ 2)$th), i.e. the median rank.
-  + Find the element $x$ of rank $r$ in $A$ using the worst-case linear-time #op("Select"), and partition $A$ around $x$. Now $x$ is in position $r$.
-  + Recurse on the subarray left of $x$ with the ranks of $I$ smaller than $r$.
-  + Recurse on the subarray right of $x$ with the ranks of $I$ larger than $r$, by decreasing each rank by $r$.
-
-  Initially we call the procedure with $#op("Quantiles");(A, (i_1, dots, i_(k-1)))$. When it returns, $A[i_1], dots, A[i_(k-1)]$ are the quantiles, as required.
-
-  *Time complexity*: The recursion always splits the array into two disjoint parts and recurses into both. The non recursion time complexity is $O(n)$. Therefore, in the recursion tree, each level contributes $O(n)$ time complexity. At each level, the rank list halves in size. The base case is hit if the  rank list is empty. Thus, the total number of levels in the recursion tree is $O(log k)$. So, the total time complexity is $O(n log k)$.
+  - If $k = 1$, return.
+  - *Find Middle Quantile:* The $floor(k/2)$-th quantile corresponds to the element at rank $i = floor(floor(k/2) dot (n/k))$.
+  - Use a linear-time selection algorithm to find the $i$-th smallest element in the array. Add this to the results.
+  - Partition the array around this element.
+  - *Recurse:*
+    - Recursively find the $floor(k/2) - 1$ quantiles in the left subarray.
+    - Recursively find the $k - floor(k/2) - 1$ quantiles in the right subarray.
+  
+  Show time complexity to be $O(n log k)$.
 ]

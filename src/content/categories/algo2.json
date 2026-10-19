@@ -42,6 +42,11 @@
       "slug": "order-statistics-sorting"
     },
     {
+      "title": "String Matching",
+      "source": "string-matching.typ",
+      "slug": "string-matching"
+    },
+    {
       "title": "Karger's Min Cut",
       "source": "karger-stein.typ",
       "slug": "karger-stein"
