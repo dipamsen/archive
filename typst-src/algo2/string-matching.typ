@@ -119,19 +119,19 @@ In (a), shift $s = 0$ fails after matching $P[1..3] = "abb"$. So we know $T[1..3
 
 In (b), shift $s = 0$ fails after matching $P[1..3] = "aaa"$. The next shift cannot be ruled out, but we already know $T[2..3] = "aa"$, which matches $P[1..2]$. The naive algorithm still goes back and re-compares these characters.
 
-The trick that we can use to reduce the number of comparisons comes from this fact: *when a mismatch occurs after matching $q$ characters, the text we just read is known to be exactly $P[1..q]$.* So what to do next depends only on the pattern and on $q$, not on the text. This lets us
+The trick that we can use to reduce the number of comparisons comes from this fact: *when a mismatch occurs after matching $q$ characters, the text we just read is known to be exactly $P[1..q]$.* So where to search from next depends only on the pattern, not on the text. This lets us
 - skip shifts that the pattern shows cannot be valid, and
 - never move backwards in $T$, so each text character is read only once.
 
 = Observations
 
-Suppose we are checking shift $s$ and the first $q$ characters of the pattern match, but then we hit a mismatch at $T[i]$, where $i = s + q + 1$. So we know exactly two things:
+Suppose we are checking shift $s$ and the first $q$ characters of the pattern match, but then we hit a mismatch at $T[i]$. So we know exactly two things:
 
 - $T[s+1..i-1] = P[1..q]$, and
 - $T[i] != P[q+1]$.
 
 #align(center)[
-  Using only this, what is the smallest shift $s' > s$ that could still be valid?
+  With this knowledge, what is the smallest shift $s' > s$ that could still be valid?
 ]
 
 #let abstract-match = cetz.canvas({
@@ -211,7 +211,7 @@ We want the smallest such $s'$ (as we don't want to skip over any valid shift); 
 
 Let the pattern be $P[1..m]$. Define the *longest prefix-suffix* $lps[q]$ ($1 <= q <= m$) as the *length of the longest proper prefix of $P[1..q]$ which is also a suffix of it.* ($0 <= lps[q] < q$)
 
-For instance, consider the pattern $P = $"ababaca". We can compute the LPS table for this pattern as shown in @lps. E.g. $lps[5] = 3$, since for the string $P[1..5] = $"ababa", its longest prefix suffix is "aba", whose length is 3. 
+Consider the pattern $P = $"ababaca". We can compute the LPS table for this pattern as shown in @lps. For instance, $lps[5] = 3$, since for the string $P[1..5] = $"ababa", its longest proper prefix-suffix is "aba", whose length is 3. 
 Note that $lps[1] = 0$ always.
 
 #let lps-tab = table(
@@ -226,8 +226,7 @@ Note that $lps[1] = 0$ always.
 
 #figure(lps-tab, caption: [LPS table for $P = $"ababaca"], kind: image) <lps>
 
-
-Suppose we have matched the first $5$ characters of $P$, but we get a mismatch at $T[i]$ with $P[6]$. By @obs, the only shifts that can still be valid are those for which a prefix of $P[1..5] = $"ababa" is also a suffix of it. These are, from longest to shortest, "aba", "a" and $epsilon$ (the empty string), and they correspond to the shifts in @chain. Each of them is consistent with the part of the text we have already matched.
+Suppose we have matched the first $5$ characters of $P$, but we get a mismatch at $T[i]$ with $P[6]$. *What are all the valid shifts we need to check ahead?* By @obs, the only shifts that can still be valid are those for which a prefix of $P[1..5] = $"ababa" is also a suffix of it. These are, from longest to shortest, "aba", "a" and $epsilon$ (the empty string), and they correspond to the shifts in @chain. Each of them is consistent with the part of $T$ we have already matched.
 
 #let compute-lps(p) = {
   let f = (0,)  // f.at(q - 1) = lps[q]
@@ -248,6 +247,14 @@ Suppose we have matched the first $5$ characters of $P$, but we get a mismatch a
   while ks.last() > 0 { ks.push(f.at(ks.last() - 1)) }
 
   rect((-1, 1.8), (7, 2.8))
+
+  content((-2.5, 2.3), $T = $)
+  content((-0.5, 2.3), $dots$)
+  content((6.5, 2.3), $dots$)
+  for i in range(6) {
+    rect((i, 1.8), (i + 1, 2.8))
+    content((i + 0.5, 2.3), "ababa ".at(i))
+  }
 
   for (r, k) in ks.enumerate() {
     let y = -r * 1.8
@@ -282,21 +289,101 @@ Suppose we have matched the first $5$ characters of $P$, but we get a mismatch a
 
 #figure(lps-chain("ababaca", 5), caption: [All proper prefix-suffixes of $P[1..5]$]) <chain>
 
-All of this information is actually encoded in the LPS table itself!
+All of this information is actually encoded in the LPS table itself: We can get all the shift positions by getting the length of each valid prefix-suffix by iterating on the $lps$ array.
 
 *Claim*: The lengths of the proper prefix-suffixes of $P[1..q]$ are exactly $lps[q], lps[lps[q]], dots, 0$.
 
 _Proof._ Write $lps^((j))[q]$ for $lps$ applied $j$ times to $q$.
 
-($supset.eq$) A prefix of a prefix is a prefix, and a suffix of a suffix is a suffix. So a proper prefix-suffix of $P[1..k]$ is also a proper prefix-suffix of $P[1..q]$ whenever $P[1..k]$ is one. Since $P[1..lps[q]]$ is a proper prefix-suffix of $P[1..q]$, so every $P[1..lps^((j))[q]]$ is also a proper prefix-suffix of $P[1..q]$, by induction on $j$.
+($supset.eq$) Note that a proper prefix-suffix of $P[1..k]$ is also a proper prefix-suffix of $P[1..q]$, if $k$ is a length of a prefix-suffix of $P[1..q]$. Since $P[1..lps[q]]$ is a proper prefix-suffix of $P[1..q]$, so every $P[1..lps^((j))[q]]$ is also a proper prefix-suffix of $P[1..q]$, by induction on $j$.
 
 ($subset.eq$) Let $P[1..k]$ be a proper prefix-suffix of $P[1..q]$, and let $k' = lps[q]$, so $k <= k'$. If $k = k'$ we are done. Otherwise $k < k'$, and both $P[1..k]$ and $P[1..k']$ are suffixes of $P[1..q]$, so $P[1..k]$ is a suffix of $P[1..k']$. It is also a prefix of $P[1..k']$, so it is a proper prefix-suffix of $P[1..k']$. Again, an inductive argument shows $k$ appears in the sequence. #h(1fr) $square$
 
-Therefore, after a mismatch at $T[i] != P[q + 1]$, we will shift by $q - lps[q]$ (why?) to get the next possible valid shift, and again try matching $T[i]$, and continue like so. Thus we can formulate the KMP algorithm.
+Therefore, after a mismatch at $T[i] != P[q + 1]$, we will shift by $q - lps[q]$ (equivalently, the matched length which was earlier $q$ will now become $k = lps[q]$) to get the next possible valid shift, and again try matching $T[i]$, and continue on. Thus we can formulate the KMP algorithm.
+
+#let shift-fig = cetz.canvas({
+  import cetz.draw: *
+  set-style(stroke: 0.6pt)
+
+  let T = "acababaababaca"   // T[13..26] of the big example
+  let P = "ababaca"
+  let n = T.len()
+  let m = P.len()
+
+  // the text (drawn once)
+  for i in range(n) {
+    rect((i, 0), (i + 1, 1))
+    content((i + 0.5, 0.5), T.at(i))
+  }
+  content((-2, 0.5), $T = $)
+
+  // ---------- shift s: q = 5 characters match, then a mismatch ----------
+  let s = 2
+  let q = 5
+  let y = -1.8
+
+  for j in range(m) {
+    let px = s + j
+    let cx = px + 0.5
+    if j < q {
+      rect((px, y), (px + 1, y + 1), stroke: green)
+      content((cx, y + 0.5), text(fill: green, P.at(j)))
+      line((cx, y + 1), (cx, y + 1.7), stroke: green)
+    } else if j == q {
+      rect((px, y), (px + 1, y + 1), stroke: red)
+      content((cx, y + 0.5), text(fill: red, P.at(j)))
+      line((cx, y + 1), (cx + 0.2, y + 1.3), (cx - 0.2, y + 1.4), (cx, y + 1.7), stroke: red)
+    } else {
+      on-layer(-1, { rect((px, y), (px + 1, y + 1), stroke: luma(200))
+      content((cx, y + 0.5), text(fill: luma(200), P.at(j))) })
+    }
+  }
+
+  line((0, y + 0.5), (s, y + 0.5), mark: (end: ">", fill: black, scale: 0.8), name: "s")
+  content((rel: (0, 0.2), to: "s"), text(0.8em)[$s$], anchor: "south")
+
+  line((s, y - 0.2), (s + q, y - 0.2),
+    mark: (symbol: "stealth", scale: 0.7, fill: black), name: "q")
+  content((rel: (0, -0.4), to: "q"), text(0.8em)[$q$])
+
+
+
+  // ---------- shift s' = s + (q - k): first k = 3 characters already match ----------
+  let k = 3
+  let s2 = s + q - k
+  let y = -5
+
+  for j in range(m) {
+    let px = s2 + j
+    let cx = px + 0.5
+    if j < k {
+      rect((px, y), (px + 1, y + 1), stroke: green)
+      content((cx, y + 0.5), text(fill: green, P.at(j)))
+      line((cx, y + 1), (cx, y + 1.7), stroke: green)
+    } else {
+      on-layer(-1, { rect((px, y), (px + 1, y + 1), stroke: luma(200))
+      content((cx, y + 0.5), text(fill: luma(200), P.at(j))) })
+    }
+  }
+
+  line((0, y + 0.5), (s2, y + 0.5), mark: (end: ">", fill: black, scale: 0.8), name: "s2")
+  content((rel: (0, 0.2), to: "s2"), text(0.8em)[$s' = s + 2$], anchor: "south")
+
+  line((s2, y - 0.2), (s2 + k, y - 0.2),
+    mark: (symbol: "stealth", scale: 0.7, fill: black), name: "k")
+  content((rel: (0, -0.5), to: "k"), text(0.8em)[$k = lps[q]$])
+}, length: 0.6cm)
+
+#figure(
+  shift-fig,
+  caption: [Shift $s$ matches $q = 5$ characters of $P$ and then mismatches. The next shift we should try is $s' = s + (q - k)$, where $k = "LPS"[q] = 3$.]
+) <shift-example>
+
+#pagebreak()
 
 = The Matching Algorithm
 
-The following is the matching algorithm for KMP, given we know how to compute the LPS table for $P$ (which we will discuss shortly).
+The following is the matching algorithm of KMP, given we know how to compute the LPS table for $P$ (which we will discuss shortly).
 
 #algorithm("KMP-String-Match", params: ([$T[1..n]$, $P[1..m]$],))[
   #aline[#lps $<-$ #call("Compute-LPS");($P$)]
@@ -390,7 +477,7 @@ The following is the matching algorithm for KMP, given we know how to compute th
 }, length: 0.4cm)
 
 
-We scan $T$ once from left to right and keep a number $q$, the length of the part of the pattern we are currently matching. Precisely, at the start of every iteration $i$, we have the *invariant*:
+We scan $T$ once from left to right and keep a number $q$, the length of the prefix of the pattern we are currently matching. Precisely, at the start of every iteration $i$, we have the *invariant*:
 
 #align(center)[
   $q$ is the length of the longest prefix of $P$ with $q < m$ that is a suffix of $T[1..i-1]$.
@@ -403,15 +490,22 @@ On each iteration:
 
 @trace shows a full worked example of the algorithm.
 
+
 == Time Complexity
 
 Let's discuss the time complexity of the matching algorithm (other than that of computing the LPS array). We will show that the running time is $Theta(n)$. The only tricky part is showing that the #While loop of lines 4-5 executes $O(n)$ times altogether, which we show by aggregate analysis.
 
 We know that $lps[q] < q$, so in each iteration of the #While loop, $q$ must strictly decrease. On each iteration of the outer #For loop, $q$ can increase at most once, on line 7. So, the value of $q$ can never exceed $n$ (since $q$ starts off at $0$ and there are $n$ iterations of the for loop). Then it follows, that the total number of iterations of the #While loop can not exceed $n$, since $q$ never becomes negative (why?). Thus, the overall running time of the matching algorithm (except LPS computation) is $Theta(n)$, i.e. linear time.
 
+
+#figure(kmp-match("abababacababacababaababacacb", "ababaca"), caption: [
+  A worked out example of the KMP algorithm, for $T = $"abababacababacababaababacacb" and $P = $"ababaca". Refer to the LPS table of $P$ in @lps. On the right, changes to $q$ show how the matching and shifts proceed. $->$ represents an increment to $q$, and $=>$ represents an update of $q$ to $lps[q]$.
+
+]) <trace>
+
 == Correctness
 
-We show that the invariant is maintained. Suppose it holds at the start of iteration $i$. At the end of this iteration we want $q$ to be the length of the longest prefix of $P$ which is a suffix of $T[1..i]$. Let this value be $k + 1$, so $P[k + 1] = T[i]$. Then, it should be the case that $P[1..k]$ is a suffix of $T[1..i - 1]$. By the invariant (see @obs) and the claim, this means $k$ should be one of $q, lps[q], lps[lps[q]], ..., 0$. We visit each such possible value in the while loop in decreasing order and stop if we can match $T[i]$, thus we get the new longest match, hence the invariant holds. If we couldn't match $T[i]$ and hit $0$, then the new $q$ is $0$. If we are able to match $m$ characters, then we output the match and then restore the invariant by setting $q <- lps[q]$.
+We show that the invariant is maintained. Suppose it holds at the start of iteration $i$. At the end of this iteration we want $q$ to be the length of the longest prefix of $P$ which is a suffix of $T[1..i]$. Let this value be $k + 1$, so $P[k + 1] = T[i]$. Then, it should be the case that $P[1..k]$ is a suffix of $T[1..i - 1]$. By the invariant and the claim, this means $k$ should be one of $q, lps[q], lps[lps[q]], ..., 0$. We visit each such possible value in the while loop in decreasing order and stop if we can match $T[i]$, thus we get the new longest match, hence the invariant holds. If we couldn't match $T[i]$ and hit $0$, then the new $q$ is $0$. If we are able to match $m$ characters, then we output the match and then restore the invariant by setting $q <- lps[q]$.
 
 #let abstract-correct = cetz.canvas({
   import cetz.draw: *
@@ -472,13 +566,6 @@ We show that the invariant is maintained. Suppose it holds at the start of itera
   caption: [Maintaining the invariant. $P[1..q]$ is the longest prefix of $P$ (with $q < m$) that is a suffix of $T[1..i-1]$. We want the longest such prefix which can be extended so that $T[i]$ is also matched.]
 ) <correct>
 
-#pagebreak(weak: true)
-
-
-#figure(kmp-match("abababacababacababaababacacb", "ababaca"), caption: [
-  A worked out example of the KMP algorithm, for $T = $"abababacababacababaababacacb" and $P = $"ababaca". Refer to the LPS table of $P$ in @lps. On the right, changes to $q$ show how the matching and shifts proceed. $->$ represents an increment to $q$, and $=>$ represents an update of $q$ to $lps[q]$.
-
-]) <trace>
 
 = Computing the LPS table
 
@@ -541,17 +628,17 @@ See @lps-trace for an example of an LPS table computed for a pattern.
         // already matched in earlier iterations
         rect((px, y), (px + 1, y + 1), stroke: green)
         content((cx, y + 0.5), text(fill: green, p.at(t)))
-        line((cx, y + 1), (cx, y + 1.7), stroke: green)
+        line((cx, y + 1), (cx, y + 1.8), stroke: green)
       } else if t == k0 {
         // the comparison P[k+1] vs P[q] made at the start
         if ok {
           rect((px, y), (px + 1, y + 1), stroke: green + 1.4pt)
           content((cx, y + 0.5), text(fill: green, p.at(t)))
-          line((cx, y + 1), (cx, y + 1.7), stroke: green)
+          line((cx, y + 1), (cx, y + 1.8), stroke: green)
         } else {
           rect((px, y), (px + 1, y + 1), stroke: red + 1.4pt)
           content((cx, y + 0.5), text(fill: red, p.at(t)))
-          line((cx, y + 1), (cx + 0.2, y + 1.3), (cx - 0.2, y + 1.4), (cx, y + 1.7), stroke: red)
+          line((cx, y + 1), (cx + 0.2, y + 1.35), (cx - 0.2, y + 1.45), (cx, y + 1.8), stroke: red)
         }
       } else {
         on-layer(-1, { rect((px, y), (px + 1, y + 1), stroke: luma(200))
@@ -573,7 +660,7 @@ See @lps-trace for an example of an LPS table computed for a pattern.
     let lbl = [$k$: #label \ $"LPS"[#(j + 1)] = #k$]
     content((m + 1, y + 0.5), text(0.8em, lbl), anchor: "west")
   }
-}, length: 0.5cm)
+}, length: 0.6cm)
 
 #figure(
   grid(columns: 2, gutter: 3em, align: horizon, lps-trace("ababaca"), lps-tab),
@@ -583,7 +670,7 @@ See @lps-trace for an example of an LPS table computed for a pattern.
 
 == Correctness
 
-Suppose that $lps[j]$ for all $j < q$ has been computed correctly, and at the start of the $q$th iteration, $k = lps[q - 1]$. We wish to find $lps[q]$, i.e. the length of the longest prefix-suffix of $P[1..q]$. Call this value $k' + 1$. Then, $P[1..k']$ must be a suffix of $P[1..q - 1]$. By the claim, this means $k' in {k, lps[k], lps[lps[k]], ..., 0}$. Thus, we iterate over each of these possibilities in decreasing order of length and stop if we are able to match $P[q]$. At this point, $k' + 1$ is the length of the longest prefix-suffix of $P[1..q]$, so we store it. If we hit $0$, then no proper prefix-suffix of $P[1..q]$ exists, so we store $0$.
+Suppose that $lps[j]$ for all $j < q$ has been computed correctly, and at the start of the $q$th iteration, $k = lps[q - 1]$. We wish to find $lps[q]$, i.e. the length of the longest prefix-suffix of $P[1..q]$. Call this value $k' + 1$. Then, $P[k' + 1] = P[q]$ and $P[1..k']$ must be a suffix of $P[1..q - 1]$. By the claim, this means $k' in {k, lps[k], lps[lps[k]], ..., 0}$. Thus, we iterate over each of these possibilities in decreasing order of length and stop if we are able to match $P[q]$. At this point, $k' + 1$ is the length of the longest prefix-suffix of $P[1..q]$, so we store it. If we hit $0$, then no proper prefix-suffix of $P[1..q]$ exists, so we store $0$.
 
 
 
@@ -611,6 +698,7 @@ We have discussed about the String Matching problem, first discussing the naive 
 6. how to compute lps, time complexity, correctness
 **/
 
+#pagebreak()
 
 = Problems and Solution Sketches
 
