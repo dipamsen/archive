@@ -55,6 +55,11 @@
       "title": "Computational Complexity",
       "source": "computational-complexity.typ",
       "slug": "computational-complexity"
+    },
+    {
+      "title": "Intractability",
+      "source": "intractability.typ",
+      "slug": "intractability"
     }
   ]
 }

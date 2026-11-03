@@ -31,8 +31,10 @@
   show link: set text(red.darken(20%))
 
   show sym.arrow.r.double: text.with(font: "New Computer Modern Math")
+  show sym.arrow.l.double: text.with(font: "New Computer Modern Math")
   show sym.arrow.r: text.with(font: "New Computer Modern Math")
   show sym.arrow.r.l.long: text.with(font: "New Computer Modern Math")
+  show "↔": text.with(font: "New Computer Modern Math")
   show sym.arrow.l.r: text.with(font: "New Computer Modern Math")
   show sym.arrow.l.r.double: text.with(font: "New Computer Modern Math")
   show sym.arrow.l.r.double.long: text.with(font: "New Computer Modern Math")
