@@ -497,6 +497,133 @@ $[arrow.l.double]$ Let $S$ be an independent set in $bar(G)$. Take any distinct 
 
 Since the sizes of $S$ agree, $G$ has a clique of size $k$ if and only if $bar(G)$ has an independent set of size $k$. This proves that #prob is NP-Complete. #h(1fr) $qed$
 
+#let prob = ss("HAMCYCLE")
+
+= #prob is NP-Complete
+
+In a graph $G = (V, E)$, a *Hamiltonian Cycle* is a cycle which goes through every vertex $v in V$ exactly once. The problem #prob is of determining whether there exists a Hamiltonian Cycle in a given graph $G$.
+
+== #prob is in NP
+
+The witness is the Hamiltonian cycle $C$. The verifier checks that $C$ visits every vertex exactly once and that it is a valid cycle in $G$.
+
+== #ss("VERTEX-COVER") $red$ #prob
+
+We now reduce an arbitrary instance of the Vertex-Cover problem to an instance of the Hamiltonian Cycle Problem, showing it to be NP-hard.
+
+Given a graph $G = (V, E)$ and a parameter $k$, construct a graph $G' = (V', E')$ such that
+#align(center)[
+  $G$ has a vertex cover of size $k$ if and only if $G'$ has a Hamiltonian Cycle.
+]
+
+We directly state the construction used: For each edge $(u, v)$ in the graph $G$, create an *edge gadget* $W_(u v)$ (@hc-gadget (a)) having 12 vertices; two "rails" of six vertices each arranged parallelly. We label the vertices in the first rail as $chevron.l u, v, 1 chevron.r$ through $chevron.l u, v, 6 chevron.r$, and similarly for the other rail as $chevron.l v, u, 1 chevron.r$ through $chevron.l v, u, 6 chevron.r$.
+
+In our construction, we will ensure that external edges that connect the gadget $W_(u v)$ to the rest of the graph can only be connected through one of the four corner vertices in the gadget (i.e. the 1st or 6th vertex of any rail). Then, we have the following property: any Hamiltonian Cycle of $G'$ should traverse $W_(u v)$ in one of the ways shown in @hc-gadget (b)-(d). 
+
+
+#let hc-widget(o, dx: 1.5, dy: 0.55, paths: (), tails: (), stubs: true,
+               labels: none, name: none, r: 0.14) = {
+  import cetz.draw: *
+  let P(s, i) = (o.at(0) + s * dx, o.at(1) - (i - 1) * dy)
+  let stub(s, i) = {
+    let p = P(s, i)
+    (p.at(0) + if s == 0 { -0.5 } else { 0.5 }, p.at(1) + if i == 1 { 0.5 } else { -0.5 })
+  }
+  let shade = (paint: primary-color.lighten(70%), thickness: 4.5pt, cap: "round", join: "round")
+
+  for p in paths { line(..p.map(v => P(v.at(0), v.at(1))), stroke: shade) }
+  for t in tails { line(stub(t.at(0), t.at(1)), P(t.at(0), t.at(1)), stroke: shade) }
+
+  for s in (0, 1) { line(P(s, 1), P(s, 6), stroke: 0.5pt) }
+  line(P(0, 1), P(1, 3), stroke: 0.5pt)
+  line(P(1, 1), P(0, 3), stroke: 0.5pt)
+  line(P(0, 4), P(1, 6), stroke: 0.5pt)
+  line(P(1, 4), P(0, 6), stroke: 0.5pt)
+  if stubs {
+    for (s, i) in ((0, 1), (1, 1), (0, 6), (1, 6)) {
+      line(stub(s, i), P(s, i), stroke: 0.5pt)
+    }
+  }
+  for s in (0, 1) {
+    for i in range(1, 7) {
+      circle(P(s, i), radius: r, fill: white, stroke: 0.5pt)
+    }
+  }
+  if labels != none {
+    let (lu, lv) = labels
+    for i in range(1, 7, step: 5) {
+      content(P(0, i), anchor: "east", padding: 0.25, text(8pt, $chevron.l #lu, #lv, #i chevron.r$))
+      content(P(1, i), anchor: "west", padding: 0.25, text(8pt, $chevron.l #lv, #lu, #i chevron.r$))
+    }
+  }
+  if name != none {
+    content((o.at(0) + dx / 2, o.at(1) - 2.5 * dy), text(9pt, name))
+  }
+}
+
+#let hc-col(s) = range(1, 7).map(i => (s, i))
+#let hc-mode-u = ((0, 1), (0, 2), (0, 3), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (0, 4), (0, 5), (0, 6))
+#let hc-mode-v = ((1, 1), (1, 2), (1, 3), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (1, 4), (1, 5), (1, 6))
+
+#figure(cetz.canvas(length: 1cm, {
+  import cetz.draw: *
+  hc-widget((1.4, 0), labels: ($u$, $v$), stubs: false, name: $W_(u v)$)
+  hc-widget((6.2, 0), paths: (hc-mode-u,), tails: ((0, 1), (0, 6)), name: $W_(u v)$)
+  hc-widget((9.6, 0), paths: (hc-col(0), hc-col(1)), tails: ((0, 1), (0, 6), (1, 1), (1, 6)), name: $W_(u v)$)
+  hc-widget((13.0, 0), paths: (hc-mode-v,), tails: ((1, 1), (1, 6)), name: $W_(u v)$)
+  for (x, l) in ((2.15, "(a)"), (6.95, "(b)"), (10.35, "(c)"), (13.75, "(d)")) {
+    content((x, -3.9), text(9pt, l))
+  }
+  content((1.4, -3.3), text(9pt, [$[u,v]$-rail]))
+  content((2.9, -3.3), text(9pt, [$[v,u]$-rail]))
+}), caption: [The gadget $W_(u v)$ for an edge $(u, v)$ of $G$. (a) The gadget with its vertices labelled. (b)--(d) The shaded paths are the only possible ones through the gadget that can be a part of a Hamiltonian Cycle.], kind: image) <hc-gadget>
+
+
+Other than the widgets, there are $k$ more vertices in $G'$, which are called *selector vertices* labelled $s_1, s_2, ..., s_k$ ($k$ is the size of the vertex cover in the Vertex Cover instance).
+
+We add edges in $G'$ as follows: First, for each $v in V$, fix an arbitrary ordering of its adjacent vertices: $v'_1, v'_2, ..., v'_p$ where let $p$ be the degree of $v$. (This means, ${(v, v'_i) | i = 1, 2, ..., p} subset.eq E$.) Then, we add edges to connect the $[v, v'_i]$ rails sequentially, and the first and the last rail to the selector vertices. In other words, we may schematically represent the edges added as
+
+#let dd = math.class("binary", sym.dash.em)
+$
+  s_j dd [v, v'_1] dd [v, v'_2] dd ... dd [v, v'_p] dd s_j.
+$
+
+Formally, for each vertex $v in V$, we add the edges ${(chevron.l v, v'_i, 6 chevron.r, chevron.l v, v'_(i + 1), 1) | 1 <= i <= p}$ in $G'$ to connect the rails amongst themselves; and the edges ${(s_j, chevron.l v, v'_1, 1 chevron.r) | 1 <= j <= k} union {(s_j, chevron.l v, v'_p, 6 chevron.r) | 1 <= j <= k}$ for connecting the selector vertices at the ends.
+
+
+It can be shown that the size of $G'$ is polynomial in the size of $G$. In particular, the number of vertices is at most $12 |E| + |V|$, and the number of edges is no more than $16 |E| + 2 |V|^2$. Thus, the construction of $G'$ takes place in polynomial time.
+
+Now we need to prove the correctess of our reduction.
+
+$[=>]$ Suppose $G$ has a vertex cover $S subset.eq V$, $|S| = k$. Let $S = {v_1, v_2, ..., v_k}$. For each $i$, let the neighbours of $v_i$ in the fixed ordering be $w_1, w_2, ..., w_p$ (where $p$ is the degree of $v_i$). We define a path $P_i$ in $G'$ that walks through the rails $[v_i, w_1], ..., [v_i, w_p]$ in this order. In the gadget $W_(v_i w_j)$ it behaves as follows:
+- If $v_i in S, w_j in.not S$, then $P_i$ traverses the _whole_ gadget, entering at $chevron.l v_i, w_j, 1 chevron.r$, visiting all 12 vertices, and leaving at $chevron.l v_i, w_j, 6 chevron.r$. This is the path shown in @hc-gadget (b) or (d), depending on which side is $v_i$'s rail.
+- If $v_i in S, w_j in S$, then $P_i$ goes straight down the rail of $v_i$, from $chevron.l v_i, w_j, 1 chevron.r$ to $chevron.l v_i, w_j, 6 chevron.r$. (The other rail of the gadget is handled by the path $P$ of $w_j$, as in @hc-gadget (c).)
+
+Between consecutive gadgets, $P_i$ uses the edge $(chevron.l v_i, w_j, 6 chevron.r, chevron.l v_i, w_(j+1), 1 chevron.r)$. Thus $P_i$ is a path from $chevron.l v_i, w_1, 1 chevron.r$ to $chevron.l v_i, w_p, 6 chevron.r$. Now consider the cycle
+$
+  s_1 dd P_1 dd s_2 dd P_2 dd ... dd s_k dd P_k dd s_1.
+$
+This is a valid cycle in $G'$, since every selector vertex is adjacent to the first and last vertices of the rails of every $v in V$. We claim that it is a Hamiltonian cycle.
+
+- Each selector vertex $s_j$ appears exactly once.
+- Consider any edge $(u, v) in E$ and its gadget $W_(u v)$. Since $S$ is a vertex cover, at least one of $u, v$ is in $S$.
+  - If exactly one of them is in $S$, say $u$, then the path $P$ of $u$ visits all 12 vertices of the gadget, and the path of $v$ does not exist, so each vertex is visited exactly once.
+  - If both are in $S$, then the path of $u$ visits the rail $chevron.l u, v, * chevron.r$ and the path of $v$ visits the rail $chevron.l v, u, * chevron.r$. These are disjoint and together cover all 12 vertices.
+
+Since every vertex is visited exactly once, so $G'$ has a Hamiltonian cycle.
+
+$[arrow.l.double]$ Suppose $G'$ has a Hamiltonian cycle $H$. We first make an observation about how $H$ behaves inside gadgets. By the property stated above, $H$ restricted to $W_(u v)$ is one of the three ways in @hc-gadget (b)-(d). In all three, a path of $H$ which enters the gadget at $chevron.l u, v, 1 chevron.r$ leaves at $chevron.l u, v, 6 chevron.r$ (and vice versa), and likewise for $v$'s rail.  //So $H$ never crosses from one rail of a gadget to the other _through the outside_; it only leaves the gadget through the other end of the same rail.
+
+Now delete the $k$ selector vertices from $H$. No two selector vertices are adjacent in $G'$, so this splits $H$ into exactly $k$ non-empty paths $P_1, ..., P_k$, which are vertex-disjoint and together contain all the non-selector vertices of $G'$. Each $P_i$ starts and ends at a first or last vertex of the rails of some $v in V$.
+
+Consider the path $P_i$ and say it starts at $chevron.l v, v'_1, 1 chevron.r$ (the case where it starts at a last vertex $chevron.l v, v'_p, 6 chevron.r$ is symmetric, reading the path backwards). By the observation, it enters $W_(v v'_1)$ through this rail, so it must leave through $chevron.l v, v'_1, 6 chevron.r$. The only edges at this vertex leaving the gadget go to $chevron.l v, v'_2, 1 chevron.r$ (if $p > 1$) or to selector vertices (if $p = 1$). Repeating this argument, $P_i$ must walk through the rails $[v, v'_1], [v, v'_2], ..., [v, v'_p]$ in order, and it can only stop when it reaches $chevron.l v, v'_p, 6 chevron.r$ and moves to a selector vertex. So each $P_i$ is a path which passes through the rails of exactly one vertex $v_i in V$, in order. Since the paths $P_i$ are vertex-disjoint, the vertices $v_1, ..., v_k$ are distinct. Let $S = {v_1, ..., v_k}$, so $|S| = k$.
+
+We claim $S$ is a vertex cover of $G$. Let $(u, v) in E$. The cycle $H$ visits every vertex of $W_(u v)$. Each such vertex lies on some $P_i$, but $P_i$ simply goes through the rails of $v_i$, so $P_i$ can only visit $W_(u v)$ if $v_i = u$ or $v_i = v$. Hence $u in S$ or $v in S$. So $S$ covers every edge of $G$, and $G$ has a vertex cover of size $k$.
+
+This completes the reduction. Thus, #prob is NP-complete. #h(1fr) $qed$
+
+#pagebreak()
+
 = Summary
 
 Starting from #ss("CIRCUIT-SAT") $in npc$ from the Cook-Levin theorem, we use reductions to prove unknown problems to be NP-Complete. Once we complete a reduction proof, the target problems get added to our pool of NP-Complete problems which we may use in the future to prove a new problem NP-Complete.
@@ -506,7 +633,7 @@ Starting from #ss("CIRCUIT-SAT") $in npc$ from the Cook-Levin theorem, we use re
 #let dot(a, b, ..args) = edge(a, b, "-|>", stroke: (dash: "dashed"), ..args)
 
 #figure(
-  scale(80%, reflow: true, diagram(
+  scale(90%, reflow: true, diagram(
     node-stroke: 0.5pt,
     node-inset: 6pt,
     node-corner-radius: 3pt,
@@ -520,20 +647,21 @@ Starting from #ss("CIRCUIT-SAT") $in npc$ from the Cook-Levin theorem, we use re
     rn((-2.5, 2), "3-COLORABILITY", unv: true),
     rn((-1.5, 2), "CLIQUE"),
     rn((0, 2), "SUBSET-SUM"),
-    rn((2, 2), "HAM-CYCLE", unv: true),
     rn((4, 2), "3D-MATCHING", unv: true),
 
-    rn((-3, 3), "SUBGRAPH-ISO", unv: true),
+    rn((-3.5, 3), "SUBGRAPH-ISO", unv: true),
     rn((-2, 3), "INDEPENDENT-SET"),
     rn((-1, 3), "VERTEX-COVER"),
     rn((0, 3), "PARTITION", unv: true),
     rn((1, 3), "KNAPSACK", unv: true),
-    rn((2, 3), "HAM-PATH", unv: true),
-    rn((3, 3), "TSP", unv: true),
     rn((4, 3), "SET-COVER", unv: true),
 
+    rn((0, 4), "HAM-CYCLE"),
     rn((-2, 4), "HITTING-SET", unv: true),
     rn((-1, 4), "DOMINATING-SET", unv: true),
+
+    rn((0, 5), "HAM-PATH", unv: true),
+    rn((1, 5), "TSP", unv: true),
 
     sol((0, 0), (0, 1)),
     sol((0, 1), (-1.5, 2)),
@@ -542,19 +670,19 @@ Starting from #ss("CIRCUIT-SAT") $in npc$ from the Cook-Levin theorem, we use re
     sol((-1.5, 2), (-2, 3)),
 
     dot((0, 1), (-2.5, 2)),           // 14, 21: 3SAT -> 3-Colorability
-    dot((0, 1), (2, 2)),            // 21: 3SAT -> Hamiltonian Cycle
     dot((0, 1), (4, 2)),            // 21: 3SAT -> 3D Matching
     dot((0, 1), (-1, 3), bend: -15deg), // 4: 3SAT -> Vertex Cover
     dot((-1, 3), (0, 2)),           // 7:  Vertex Cover -> Subset Sum
     dot((0, 2), (0, 3)),            // 8:  Subset Sum -> Partition
     dot((0, 2), (1, 3)),            // 15: Subset Sum -> Knapsack
     dot((-1, 3), (-2, 4)),          // 9:  Vertex Cover -> Hitting Set
+    sol((-1, 3), (0, 4)),            // 21: Vertex Cover -> Hamiltonian Cycle
     dot((-1, 3), (-1, 4)),          // 20: Vertex Cover -> Dominating Set
     dot((4, 2), (4, 3)),            // 11: 3DM -> Set Cover
-    dot((-1.5, 2), (-3, 3)), // 19: Clique -> Subgraph Isomorphism
-    dot((2, 2), (2, 3), bend: 20deg),   // 17: Ham Cycle -> Ham Path
-    dot((2, 3), (2, 2), bend: 20deg),   // 18: Ham Path -> Ham Cycle
-    dot((2, 2), (3, 3)),            // 13: Ham Cycle -> TSP
+    dot((-1.5, 2), (-3.5, 3)), // 19: Clique -> Subgraph Isomorphism
+    dot((0, 4), (0, 5), bend: 20deg),   // 17: Ham Cycle -> Ham Path
+    dot((0, 5), (0, 4), bend: 20deg),   // 18: Ham Path -> Ham Cycle
+    dot((0, 4), (1, 5)),            // 13: Ham Cycle -> TSP
   )),
   caption: [The zoo of NP-Complete problems. An arrow from $A$ to $B$ indicates a reduction $A red B$. Solid edges show reductions which we have shown, and dotted edges denote reductions asked in the problems.],
   kind: image,
@@ -1204,7 +1332,7 @@ Thus, #ss("HP") is NP-hard.
 21. Prove the following problems to be NP-complete: Hamiltonian Cycle, 3-Dimensional Matching, 3-Colorability of graphs.
 
 #soln-box[
-  *Hamiltonian Cycle*: #ss("3SAT") $red$ #ss("HAMCYCLE"): KT book, Theorem 8.17 (p475)
+  *Hamiltonian Cycle*: #ss("VERTEX-COVER") $red$ #ss("HAMCYCLE"): given in notes.
 
   *3D Matching*: #ss("3SAT") $red$ #ss("3D-MATCHING"): KT book, Theorem 8.20 (p482)
 
