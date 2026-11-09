@@ -60,6 +60,11 @@
       "title": "Intractability",
       "source": "intractability.typ",
       "slug": "intractability"
+    },
+    {
+      "title": "Approximation Algorithms",
+      "source": "approximation.typ",
+      "slug": "approximation-algos"
     }
   ]
 }
