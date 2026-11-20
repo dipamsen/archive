@@ -31,20 +31,20 @@ While we have good algorithms for many optimisation problems, in the real world,
 
 For an optimisation problem, we call an algorithm which returns a near-optimal solution, an *approximation algorithm*.
 
-Given some optimisation problem with optimal solution value #opt, and an algorithm which produces a feasible solution with value #alg, we say that the algorithm is an approximation algorithm with an *approximation ratio* $rho(n)$. It is also called a $rho$-approximation algorithm.
+Given some optimisation problem with optimal solution value #opt, and an algorithm which produces a feasible solution with value #alg, we say that the algorithm is an approximation algorithm with an *approximation ratio* $rho(n)$ (where $n$ is the size of the instance $I$). It is also called a $rho$-approximation algorithm.
 
 For a *minimisation problem*, we define the approximation ratio as
 $
   rho(n) = max_(|I|<= n) alg(I) / opt(I)
 $
 
-In other words, if an approximation algorithm has an approximation ratio of $rho$, then for any instance $I$, we have
+In other words, if an approximation algorithm has an approximation ratio of $rho$, then for any instance $I$, our algorithm returns a value $alg$ which is *at most $rho$ times* the true minimum value, $opt$.
 $
   alg / opt <= rho.
 $
 Note that $rho >= 1$.
 
-For a *maximisation problem* we define $rho$ to (lower) bound the same ratio $alg / opt$, so we get $0 < rho <= 1$. In some texts, a different convention is used, where the reciprocal ratio is used for defining $rho$, to consistently have $rho >= 1$.
+For a *maximisation problem* we define $rho$ to (lower) bound the same ratio $alg / opt$, so we get $0 < rho <= 1$. ($alg$ is at least $rho$ times $opt$.) In some texts, a different convention is used, where the reciprocal ratio is used for defining $rho$, to consistently have $rho >= 1$.
 
 Ideally, for a _good_ approximation algorithm, we would want our approximation ratio $rho(n)$ to be a constant value (independent of $n$). This indicates, that how far the two values $alg$ and $opt$ are does not grow with the size of the input, i.e. the approximation does not become worse for larger inputs.
 
@@ -69,21 +69,23 @@ alg(I) <= rho dot L(I) <= rho dot opt(I) quad ==> quad alg(I) / opt(I) <= rho,
 $
 so the algorithm is a $rho$-approximation algorithm.
 
+This strategy becomes clear once we look at some examples.
+
 #let prob = ss("MIN-VERTEX-COVER")
 
 = Approximating #prob
 
 For the optimisation problem #prob, we need to find a minimum size subset of vertices, such that every edge is incident on at least one vertex in the set.
 
-We will show a 2-approximation algorithm for #prob. This means, $alg <= 2 opt$, so the vertex cover produced by our algorithm will be no more than twice the size of the actual optimum.
+We will show a 2-approximation algorithm for #prob. This means, $alg <= 2 opt$, so the vertex cover produced by our algorithm will be no more than twice the size of the actual minimum.
 
-To find a lower bound on $opt$, we use a _maximal matching_. A *matching* in $G = (V, E)$ is a set of edges $M subset.eq E$ such that no two edges in $M$ share an endpoint. A matching is *maximal* if it is not a strict subset of any other matching.#footnote[This is different from a _maximum_ matching.] A maximal matching can be found in polynomial time greedily: pick any edge in the graph, add the edge to $M$ and remove all its neighbouring edges; and repeat until the graph is empty.
+First, to find a lower bound on $opt$, we use a _maximal matching_. A *matching* in $G = (V, E)$ is a set of edges $M subset.eq E$ such that no two edges in $M$ share an endpoint. A matching is *maximal* if it is not a strict subset of any other matching.#footnote[This is different from a _maximum_ matching.] A maximal matching can be found in polynomial time greedily: pick any edge in the graph, add the edge to $M$ and remove it and all its neighbouring edges from the graph; and repeat until the graph is empty.
 
 Let $M$ be a maximal matching of $G$. We claim that
 $
 opt >= |M|.
 $
-Take an optimal vertex cover $S^*$. It must contain at least one endpoint of every edge in $M$. Since the edges of $M$ share no endpoints, these endpoints are all different vertices, so $S^*$ contains at least $|M|$ vertices. Now, to use $M$ to get a feasible solution with value $alg$, such that $alg <= 2 |M|$, we will simply pick both endpoints of each edge in $M$.
+Take an optimal vertex cover $S^*$. It must contain at least one endpoint of every edge in $M$. Since the edges of $M$ share no endpoints, the endpoints chosen in $S^*$ are all different vertices, so $S^*$ contains at least $|M|$ vertices. Now, to use $M$ to get a feasible solution with value $alg$, such that $alg <= 2 |M|$, we will simply pick both endpoints of each edge in $M$.
 
 Then, we can describe our approximation algorithm as follows.
 + Compute a maximal matching $M$ of $G$.
@@ -148,7 +150,7 @@ It turns out, even this special case is still NP-Complete. But now we will see t
 
 First we need a useful lower bound for the tour size. Let $H$ be an optimal tour with weight $opt$. Delete any one edge from this to get a Hamiltonian path in $G$. In fact, it is a spanning tree of $G$.
 
-Let $T$ be a minimum spanning tree of $G$. Then it follows, that this is a lower bound,  $w(T) <= opt$.
+Let $T$ be a minimum spanning tree of $G$. Then it follows, that this is a lower bound,  $w(T) <= w(H) = opt$ (all edges have non negative weights).
 
 We need the algorithm to use the minimum spanning tree and construct a tour whose weight is no larger than twice the weight of the spanning tree itself.
 
@@ -156,7 +158,7 @@ We need the algorithm to use the minimum spanning tree and construct a tour whos
 
 - Compute a minimum spanning tree $T$ of $G$.
 - Consider a Euler tour of the tree $T$, this is a walk $W$ on the tree which starts and ends at the first vertex and traverses every edge in the tree twice. Clearly $w(W) = 2 w(T)$.
-- The walk $W$ visits some vertices more than once. Traverse $W$ and _shortcut_ it: whenever we are at a vertex that will be visited again later, skip it and go straight to the next vertex on the walk that is being visited for the last time. Equivalently, output the vertices of $T$ in the order in which a depth-first traversal last visits them (a _postorder_ traversal). The resulting sequence of vertices, closed up at the start, is a tour $H$.
+- The walk $W$ visits some vertices more than once. Traverse $W$ and _shortcut_ it: whenever we are at a vertex that has already been visited earlier, skip it and go straight to the next vertex on the walk. Equivalently, output the vertices of $T$ in the order in which a depth-first traversal first visits them (a _preorder_ traversal)#footnote[A _postorder_ traversal works equally well.]. The resulting sequence of vertices, closed up at the start, is a tour $H$.
 
 Shortcutting replaces a part $x -> y_1 -> ... -> y_m -> z$ of the walk by the single edge $(x, z)$. By repeated application of the triangle inequality, $d(x, z) <= d(x, y_1) + ... + d(y_m, z)$, so shortcutting never increases the weight. Therefore,
 $alg = w(H) <= w(W) = 2 w(T) <= 2 opt.$
@@ -227,7 +229,7 @@ So this is a 2-approximation algorithm for #mtsp, and it runs in polynomial time
 #figure(cetz.canvas(length: 0.85cm, {
   tsp-panel((0, 0), ((tsp-tree, tsp-thin, 0),), label: [(a) the MST $T$])
   tsp-panel((6, 0), ((tsp-tree, tsp-thin, 0.07),), label: [(b) the Eulerian walk $W$])
-  tsp-panel((12, 0), ((tsp-tree, tsp-faint, 0), ((("A", "C"), ("C", "B"), ("B", "D"), ("D", "E"), ("E", "F"), ("F", "A")), tsp-thick, 0)), label: [(c) the final tour $H$])
+  tsp-panel((12, 0), ((tsp-tree, tsp-faint, 0), ((("A", "B"), ("B", "C"), ("C", "D"), ("D", "E"), ("E", "F"), ("F", "A")), tsp-thick, 0)), label: [(c) the final tour $H$])
 }), caption: [The 2-approximation on an instance of metric TSP with 6 vertices.], kind: image) <tsp-2approx>
 
 
@@ -263,7 +265,7 @@ So this is a $3 / 2$-approximation algorithm for #mtsp.
 
 #let prob = ss("MAX-E3SAT")
 
-= Approximating #prob
+= Approximating Weighted #prob
 
 In the #ss("MAX-E3SAT") (_exactly-3 SAT_) problem, we are given a 3CNF formula $phi$ with clauses $C_1, ..., C_m$, where every clause has exactly three literals over three distinct variables. (A clause that contains both $x$ and $overline(x)$ is always satisfied, so we may discard it.) We want to find an assignment of the variables which satisfies as many clauses as possible. This is a maximisation problem, and it is NP-hard, since deciding whether *all* the clauses can be satisfied is exactly #ss("E3SAT") (which is NP-Complete).
 
@@ -293,13 +295,93 @@ Finally, no assignment can satisfy more than all the clauses, so $opt <= W$. Hen
 $
 E[alg] = 7 / 8 W >= 7 / 8 opt.
 $
-This is a *randomised $7 / 8$-approximation algorithm* for #prob: its output has _expected_ value within a factor of $7 / 8$ of the optimum.
-
+This is a *randomised $7 / 8$-approximation algorithm* for #prob: its output has _expected_ value at least $7 / 8$ of the optimum.
 
 
 By virtue of being a randomised algorithm, it doesn't always guarantee the lower bound of the approximation factor, it is only in _expectation_ that the value will be at least $7/8$ times the optimal value. As we will see in Problem 5, we can get a deterministic algorithm that always finds such an assignment by *derandomisation* of our algorithm.
 
+#let prob = ss("MIN-SET-COVER")
 
+= Approximating #prob
+
+In the #prob problem, we are given a universe $X = {1, 2, ..., n}$ and a family $cal(F) = {S_1, ..., S_m}$ of subsets of $X$, whose union is all of $X$. A *set cover* is a subfamily $C subset.eq cal(F)$ which covers every element, i.e. $union.big_(S in C) S = X$. We want to find a set cover with the minimum number of sets. Let $C^*$ be an optimal cover, so $opt = |C^*|$.
+
+The decision version of this problem is NP-complete, as we have seen previously, the set-cover problem is a generalisation of Vertex-cover (and many other hard problems). We want to find an approximation algorithm for it. Unlike the earlier problems, we will not get a constant factor here. Instead, we will show a greedy algorithm whose approximation ratio grows slowly with $n$, like $log n$.
+
+== Greedy Set Cover
+
+The idea is to repeatedly pick the set which covers the most elements that are still uncovered.
+
+*Algorithm.*
++ $U <- X$ (the set of uncovered elements), $C <- emptyset$.
++ While $U != emptyset$:
+  + Select the set $S in cal(F)$ which maximises $|S inter U|$.
+  + $U <- U without S$ and $C <- C union {S}$.
++ Output $C$.
+
+Every iteration covers at least one new element (as the sets of $cal(F)$ cover $X$), so the algorithm terminates after at most $n$ iterations, and clearly runs in polynomial time. The output $C$ is a set cover by the termination condition. We will prove that
+$
+alg <= (log n + 1) dot opt.
+$
+
+== Analysis
+
+To prove the bound, we first define a _cost_ $c_x$ for each element $x in X$. This cost denotes that element's contribution to the final size of our cover $C$.
+
+Let $T_i$ be the set chosen in the $i$th iteration, and let
+$
+N_i = T_i without (T_1 union ... union T_(i-1))
+$
+be the set of elements which are covered for the first time in iteration $i$. Choosing $T_i$ costs us $1$ (in our final answer of $|C|$), which we spread equally over the elements of $N_i$: every $x in N_i$ gets a cost
+$
+c_x = 1 / (|N_i|).
+$
+Note that each element $x in X$ is first covered in exactly one iteration $i$, so the costs for each element is well defined. Since the cost of every chosen set (which is $1$) is fully distributed over the elements,
+$
+|C| = sum_(x in X) c_x.
+$
+
+*Observation.* Every element is contained in at least one set of the optimal cover $C^*$, and all costs are non-negative, so
+$
+sum_(S in C^*) sum_(x in S) c_x >= sum_(x in X) c_x = |C|.
+$
+(An element which belongs to several sets of $C^*$ is simply counted several times on the left.)
+
+So it is enough to upper bound the inner sum for a single set. Let $H(k) = sum_(j = 1)^k 1 / j$ be the $k$th *harmonic number* (with $H(0) = 0$).
+
+*Claim.* For every set $S in cal(F)$, $quad sum_(x in S) c_x <= H(|S|).$
+
+_Proof._ Let $k$ be the number of iterations of the algorithm. For $0 <= i <= k$, let $u_i$ be the number of elements of $S$ which are still uncovered after the $i$th iteration. Then $u_0 = |S|$, $u_k = 0$, and $u_(i-1) >= u_i$. The number of elements of $S$ which are covered for the first time in the $i$th iteration is $u_(i-1) - u_i$, and each of them has cost $1 / (|N_i|)$. Hence
+$
+sum_(x in S) c_x = sum_(i = 1)^k (u_(i-1) - u_i) / (|N_i|).
+$
+Now, consider an iteration $i$ with $u_(i-1) > 0$ (there are still elements uncovered in $S$ before this iteration). Before this iteration, the set $S$ itself had $u_(i-1)$ uncovered elements, i.e. $|S inter U| = u_(i-1)$. The greedy algorithm chose $T_i$ which maximises this quantity, so
+$
+|N_i| = |T_i inter U| >= |S inter U| = u_(i-1).
+$
+($|N_i|$ is the number of elements that got newly covered in the $i$th iteration.)
+Therefore,
+$
+  sum_(x in S) c_x
+  &= sum_(i = 1)^k (u_(i-1) - u_i) / (|N_i|) quad quad quad
+  &&<= sum_(i = 1)^k (u_(i-1) - u_i) dot 1 / u_(i-1) \
+  &= sum_(i = 1)^k sum_(j = u_i + 1)^(u_(i-1)) 1 / u_(i-1) 
+  &&<= sum_(i = 1)^k sum_(j = u_i + 1)^(u_(i-1)) 1 / j quad quad quad quad quad quad &&("because" j <= u_(i-1)) \
+  &= sum_(i = 1)^k (sum_(j = 1)^(u_(i-1)) 1 / j - sum_(j = 1)^(u_i) 1 / j) 
+  &&= sum_(i = 1)^k (H(u_(i-1)) - H(u_i)) \
+  &= H(u_0) - H(u_k)  quad quad quad quad &&&&("the sum telescopes") \
+  &= H(|S|).
+$
+
+Let $s = max_(S in cal(F)) |S|$ be the size of the largest set. Combining the observation and the claim,
+$
+alg = |C| = sum_(x in X) c_x <= sum_(S in C^*) sum_(x in S) c_x <= sum_(S in C^*) H(|S|) <= |C^*| dot H(s) = H(s) dot opt.
+$
+Finally, $s <= n$, and
+$
+H(n) = 1 + sum_(j = 2)^n 1 / j <= 1 + integral_1^n (d x) / x = 1 + log n.
+$
+Therefore the greedy algorithm is an $(log n + 1)$-approximation algorithm for #prob.
 #pagebreak() 
 
 = Problems and Solution Sketches
